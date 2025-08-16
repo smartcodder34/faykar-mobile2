@@ -13,6 +13,7 @@ type ButtonType = {
   icon?: React.ReactNode;
   iconPostion?: string;
   onPress?: () => void;
+  rounded?: boolean;
   style?: any;
 };
 const CustomButton = ({
@@ -24,11 +25,13 @@ const CustomButton = ({
   whiteBg,
   borderBn,
   onPress,
+  rounded,
   style,
 }: ButtonType) => {
   const getBgColor = () => {
     if (disabled) return "bg-divider";
     if (primary) return "bg-primary text-white";
+    if (rounded) return "bg-primary text-white rounded-full";
     if (danger) return "bg-red";
     if (whiteBg) return "text-primary font-bold";
     if (borderBn) return "border border-divider";
@@ -46,7 +49,7 @@ const CustomButton = ({
         {title && (
           <>
             <Text
-              className={` font-[PoppinsMedium]   ${
+              className={` font-[PoppinsMedium]    ${
                 borderBn ? null : getBgColor()
               }`}
               style={{ fontSize: rS(12) }}

@@ -65,7 +65,7 @@ InputType) => {
   };
 
   const getBgColor = () => {
-    if (primary) return "border border-divider bg-onsurface";
+    if (primary) return "border border-[#B4B4B4] bg-onsurface";
     if (whiteBg) return "bg-[#ffffff] border border-divider";
   };
   return (
