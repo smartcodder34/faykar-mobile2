@@ -1,3 +1,4 @@
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
@@ -10,6 +11,8 @@ import "../../global.css";
 import NetworkStatus from "../components/NetworkStatus";
 import { useAppFocusManager } from "../lib/focusManager";
 import { setupNetworkStatus } from "../lib/networkManager";
+import useAuthStore from "../store/authStore";
+
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -30,7 +33,8 @@ SplashScreen.setOptions({
 setupNetworkStatus();
 
 export default function RootLayout() {
-  const isLoggedIn = false;
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+  const initializeAuth = useAuthStore((state) => state.initializeAuth);
 
   const [loaded] = useFonts({
     PoppinsLight: require("../../assets/fonts/Poppins-Light.ttf"),
@@ -38,6 +42,10 @@ export default function RootLayout() {
     PoppinsMedium: require("../../assets/fonts/Poppins-Medium.ttf"),
     PoppinsBold: require("../../assets/fonts/Poppins-Bold.ttf"),
     PoppinsSemiBold: require("../../assets/fonts/Poppins-SemiBold.ttf"),
+    InterLight: require("../../assets/fonts/Inter_18pt-Light.ttf"),
+    InterRegular: require("../../assets/fonts/Inter_18pt-Regular.ttf"),
+    InterSemiBold: require("../../assets/fonts/Inter_18pt-SemiBold.ttf"),
+    InterBold: require("../../assets/fonts/Inter_24pt-Bold.ttf"),
     PlusJakartaSansLight: require("../../assets/fonts/PlusJakartaSans-Light.ttf"),
     PlusJakartaSansMedium: require("../../assets/fonts/PlusJakartaSans-Medium.ttf"),
     PlusJakartaSansRegular: require("../../assets/fonts/PlusJakartaSans-Regular.ttf"),
@@ -46,6 +54,21 @@ export default function RootLayout() {
 
   // Setup app focus management
   useAppFocusManager();
+
+  // Initialize auth on app start
+  useEffect(() => {
+    initializeAuth();
+  }, [initializeAuth]);
+
+  useEffect(() => {
+    GoogleSignin.configure({
+      webClientId:
+        "428400835439-38ckn1snv4703kv29c08qqhlln7atvoj.apps.googleusercontent.com",
+      iosClientId:
+        "428400835439-sdhjn80r74a0da615hrs851ke12mfnsg.apps.googleusercontent.com",
+      profileImageSize: 120,
+    });
+  }, []);
 
   useEffect(() => {
     if (loaded) {

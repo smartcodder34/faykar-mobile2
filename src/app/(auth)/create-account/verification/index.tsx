@@ -1,8 +1,10 @@
+import { useVerifyEmail } from "@/src/api-services/authApi/authMutation";
 import OtpPin from "@/src/components/auth/OtpPin";
 import RegisterSuccessSheet from "@/src/components/auth/RegisterSuccessSheet";
 import BottomSheetScreen from "@/src/CustomComps/BottomSheetScreen";
 import CustomButton from "@/src/CustomComps/CustomButton";
 import Screen from "@/src/layout/Screen";
+import useAuthStore from "@/src/store/authStore";
 import { AntDesign } from "@expo/vector-icons";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { Image } from "expo-image";
@@ -14,6 +16,21 @@ const Verification = () => {
   const router = useRouter();
   const [value, setValue] = React.useState("");
 
+  const email = useAuthStore((state) => state.userRegOtps.email);
+
+  console.log("email777", email);
+
+
+  console.log("value234:", value);
+
+   const handleVerifyEmail = () => {
+     emailVerification.mutate({
+       email: email,
+       otp: value,
+     });
+   };
+
+
   // bottom sheet
   const snapPoints = useMemo(() => ["30%", "50%"], []);
   //open the bottom sheet
@@ -24,6 +41,10 @@ const Verification = () => {
     verifybottomSheetRef.current?.expand();
   const handleVerifyBottomSheetClose = () =>
     verifybottomSheetRef.current?.close();
+
+
+    const emailVerification = useVerifyEmail(handleVerifyBottomSheetOpen);
+
 
   return (
     <Screen className=" ">
@@ -60,10 +81,7 @@ const Verification = () => {
           />
         </View>
 
-        <Text
-          className="my-5 text-xl font-[PlusJakartaSansSemiBold]"
-          onPress={handleVerifyBottomSheetOpen}
-        >
+        <Text className="my-5 text-xl font-[PlusJakartaSansSemiBold]">
           Verification Code
         </Text>
 
@@ -71,7 +89,7 @@ const Verification = () => {
           <Text className=" text-[#8E8E93] font-[PlusJakartaSansRegular]">
             We have sent the verification code to
           </Text>
-          <Text className=" my-3">robert.adams@email.com</Text>
+          <Text className=" my-3">{email}</Text>
         </View>
       </View>
 
@@ -80,7 +98,7 @@ const Verification = () => {
       </View>
 
       <View className="p-8">
-        <CustomButton rounded title="Submit" />
+        <CustomButton rounded title="Submit" onPress={handleVerifyEmail} />
         <Text className="text-center my-2">
           Didn’t received the code? Resend
         </Text>

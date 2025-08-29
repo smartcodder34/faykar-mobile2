@@ -1,12 +1,12 @@
 import React from 'react'
 import { Text, View } from 'react-native'
 
-const index = () => {
+const SearchPage = () => {
   return (
     <View>
-      <Text>index</Text>
+      <Text>SearchPage</Text>
     </View>
   )
 }
 
-export default index
+export default SearchPage
