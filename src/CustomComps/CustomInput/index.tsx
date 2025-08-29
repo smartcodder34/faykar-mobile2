@@ -1,5 +1,4 @@
 import { rS, rV } from "@/src/lib/responsivehandler";
-import { Skeleton } from "moti/skeleton";
 import React from "react";
 import { KeyboardTypeOptions, Text, TextInput, View } from "react-native";
 
@@ -7,8 +6,10 @@ type InputType = {
   label?: string;
   name?: string;
   placeholder?: string;
-  icon?: React.ReactNode;
-  iconPostion?: string;
+  icon?: React.ReactNode; // Left icon (for backward compatibility)
+  leftIcon?: React.ReactNode; // Explicit left icon
+  rightIcon?: React.ReactNode; // Right icon
+  iconPostion?: string; // Keep for backward compatibility
   value?: string;
   onChangeText?: (text?: string) => void;
   secureTextEntry?: boolean;
@@ -28,6 +29,8 @@ type InputType = {
 const CustomInput = ({
   label,
   icon,
+  leftIcon,
+  rightIcon,
   iconPostion,
   onChangeText,
   value,
@@ -43,92 +46,87 @@ const CustomInput = ({
   onBlur,
   multiline,
   isLoading,
-}: // width,
-InputType) => {
+}: InputType) => {
   const [focused, setFocused] = React.useState(false);
-  // const width = 60
-  const Spacer = ({ height = 16 }) => <View style={{ height }} />;
 
-  const getFlexDirection = () => {
-    if (!icon && !iconPostion) {
-      return "flex-row";
-    }
-    if (icon && iconPostion) {
-      if (iconPostion === "left") {
-        return "flex-row";
-      } else {
-        if (iconPostion === "right") {
-          return "flex-row-reverse";
-        }
-      }
-    }
+  // Determine which icons to use
+  const getLeftIcon = () => {
+    if (leftIcon) return leftIcon;
+    if (icon && (!iconPostion || iconPostion === "left")) return icon;
+    return null;
+  };
+
+  const getRightIcon = () => {
+    if (rightIcon) return rightIcon;
+    if (icon && iconPostion === "right") return icon;
+    return null;
   };
 
   const getBgColor = () => {
     if (primary) return "border border-[#B4B4B4] bg-onsurface";
     if (whiteBg) return "bg-[#ffffff] border border-divider";
   };
+
+  const leftIconElement = getLeftIcon();
+  const rightIconElement = getRightIcon();
+
   return (
     <>
       <View className="my-1">
-        <Skeleton show={isLoading} width={"60%"} colorMode={"light"}>
-          <>
-            {label && (
-              <Text
-                className="mb-2 font-[PoppinsMedium] text-black "
-                style={{ fontSize: rS(12) }}
-              >
-                {label}
-              </Text>
-            )}
-          </>
-        </Skeleton>
-        {isLoading && <Spacer />}
-        <Skeleton show={isLoading} colorMode={"light"}>
-          <View
-            className={` rounded-2xl ${getBgColor()}  items-center px-3 ${getFlexDirection()}`}
-            style={{ height: rV(45) }}
-          >
-            <View className="">{icon && icon}</View>
-            <TextInput
-              secureTextEntry={secureTextEntry}
-              placeholder={placeholder}
-              placeholderTextColor="#9B9B9B"
-              keyboardType={keyboardType as KeyboardTypeOptions}
-              onBlur={() => {
-                setFocused(false);
-              }}
-              // onFocus={() => {
-              //   setFocused(true);
-              // }}
-              editable={editable}
-              onFocus={onFocus}
-              onChangeText={onChangeText}
-              value={value}
-              textAlign={isArabic ? "right" : undefined} // Right-align for Arabic
-              style={{
-                fontSize: rS(14),
-                height: rV(44),
-                flex: 1,
-                padding: 2,
-                color: "#000",
-              }}
-            />
-          </View>
-        </Skeleton>
-        {isLoading && <Spacer />}
-        <Skeleton show={isLoading} width={"60%"} colorMode={"light"}>
-          <>
-            {error && (
-              <Text
-                className=" text-red  px-2 font-[PoppinsLight]"
-                style={{ fontSize: rS(10) }}
-              >
-                {error}
-              </Text>
-            )}
-          </>
-        </Skeleton>
+        <>
+          {label && (
+            <Text
+              className="mb-2 font-[PoppinsMedium] text-black "
+              style={{ fontSize: rS(12) }}
+            >
+              {label}
+            </Text>
+          )}
+        </>
+        <View
+          className={`rounded-2xl ${getBgColor()} flex-row items-center px-3`}
+          style={{ height: rV(45) }}
+        >
+          {/* Left Icon */}
+          {leftIconElement && <View className="mr-2">{leftIconElement}</View>}
+
+          {/* Text Input */}
+          <TextInput
+            secureTextEntry={secureTextEntry}
+            placeholder={placeholder}
+            placeholderTextColor="#9B9B9B"
+            keyboardType={keyboardType as KeyboardTypeOptions}
+            onBlur={() => {
+              setFocused(false);
+            }}
+            editable={editable}
+            onFocus={onFocus}
+            onChangeText={onChangeText}
+            value={value}
+            textAlign={isArabic ? "right" : undefined}
+            style={{
+              fontSize: rS(14),
+              height: rV(44),
+              flex: 1,
+              padding: 2,
+              color: "#000",
+            }}
+          />
+
+          {/* Right Icon */}
+          {rightIconElement && <View className="ml-2">{rightIconElement}</View>}
+        </View>
+
+        <>
+          {error && (
+            <Text
+              className=" text-red-500 mt-2  px-2 font-[PoppinsLight]"
+              style={{ fontSize: rS(10) }}
+            >
+              {error}
+            </Text>
+          )}
+        </>
       </View>
     </>
   );
