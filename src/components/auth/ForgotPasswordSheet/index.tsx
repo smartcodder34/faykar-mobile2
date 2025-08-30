@@ -22,8 +22,8 @@ const ForgotPasswordSheet = ({ handleForgotPassswordClose }: any) => {
         <View className="mt-5">
           <CustomInput
             primary
-            label="Email or Phone Number"
-            placeholder="Enter your email or phone number"
+            label="Email"
+            placeholder="Enter your email "
             iconPostion="left"
             icon={
               <View className="mx-3">
