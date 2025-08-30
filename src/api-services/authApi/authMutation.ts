@@ -1,9 +1,10 @@
 import { handleAxiosError } from "@/src/lib/handleAxiosError";
 import useAuthStore from "@/src/store/authStore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-import { loginUser, registerUser, verifyEmail } from ".";
+import { EditUserDetails, loginUser, registerUser, verifyEmail } from ".";
+
 
 // Mutation api call
 
@@ -59,6 +60,24 @@ export const useLoginUser = () => {
     },
     onError(error: any) {
       console.log("login error", error.response?.status === 403);
+      handleAxiosError(error);
+    },
+  });
+};
+
+
+export const useEditUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: EditUserDetails,
+    onSuccess(data: any) {
+      // showSuccessToast({
+      //   message: data.message,
+      // });
+
+      queryClient.invalidateQueries({ queryKey: ["get-profile"] });
+    },
+    onError(error: any) {
       handleAxiosError(error);
     },
   });
