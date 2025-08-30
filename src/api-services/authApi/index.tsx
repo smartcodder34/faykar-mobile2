@@ -31,4 +31,24 @@ export const loginUser = async (data: any) => {
   }
 };
 
+export const getProfile = async (data: any) => {
+  try {
+    const res = await axiosInstance.get(`/profile`, data);
+    return res.data;
+  } catch (error) {
+    console.error("getUserApi:", error);
+    throw error;
+  }
+};
+
+export const EditUserDetails = async (data: any) => {
+  try {
+    const res = await axiosInstance.patch(`/profile/update`, data);
+    return res.data;
+  } catch (error) {
+    console.error("EditUserDetails:", error);
+    throw error;
+  }
+};
+
 
