@@ -1,10 +1,19 @@
 import { handleAxiosError } from "@/src/lib/handleAxiosError";
 import useAuthStore from "@/src/store/authStore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-import { EditUserDetails, loginUser, registerUser, verifyEmail } from ".";
-
+import {
+  EditUserDetails,
+  forgotPasswordApi,
+  loginSocialUser,
+  loginUser,
+  registerSocialUser,
+  registerUser,
+  resetPasswordApi,
+  verifyEmail,
+} from ".";
 
 // Mutation api call
 
@@ -54,8 +63,7 @@ export const useLoginUser = () => {
         await AsyncStorage.setItem("token", data.data.access_token.token);
         setIsLoggedIn(true);
         router.push("/(tabs)/homepage");
-      console.log("data000:", data);
-
+        console.log("data000:", data);
       }
     },
     onError(error: any) {
@@ -65,8 +73,40 @@ export const useLoginUser = () => {
   });
 };
 
+export const useForgotPasswordApi = (handleResetPassswordOpen: any) => {
+  const router = useRouter();
+  return useMutation({
+    mutationFn: forgotPasswordApi,
+    async onSuccess(data) {
+      if (data) {
+        handleResetPassswordOpen();
+      }
+    },
+    onError(error) {
+      console.log("forgot password error", error);
+      handleAxiosError(error);
+    },
+  });
+};
+
+export const useResetPasswordApi = () => {
+  const router = useRouter();
+  return useMutation({
+    mutationFn: resetPasswordApi,
+    async onSuccess(data) {
+      if (data) {
+        router.push("/login");
+      }
+    },
+    onError(error) {
+      console.log("Reset password error", error);
+      handleAxiosError(error);
+    },
+  });
+};
 
 export const useEditUser = () => {
+  const router = useRouter();
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: EditUserDetails,
@@ -76,8 +116,48 @@ export const useEditUser = () => {
       // });
 
       queryClient.invalidateQueries({ queryKey: ["get-profile"] });
+
     },
     onError(error: any) {
+      handleAxiosError(error);
+    },
+  });
+};
+
+//social
+export const useRegisterSocialUser = () => {
+  const router = useRouter();
+  return useMutation({
+    mutationFn: registerSocialUser,
+    async onSuccess(data) {
+      console.log("register success data:", data);
+      await GoogleSignin.signOut();
+      router.push("/login");
+    },
+    onError(error) {
+      handleAxiosError(error);
+    },
+  });
+};
+
+
+
+export const useLoginSocialUser = () => {
+  const router = useRouter();
+  const setIsLoggedIn = useAuthStore().setIsLoggedIn;
+
+  return useMutation({
+    mutationFn: loginSocialUser,
+    async onSuccess(data) {
+      if (data) {
+      console.log("login success data:", data);
+
+        await AsyncStorage.setItem("token", data.data.access_token.token);
+        setIsLoggedIn(true);
+        router.push("/(tabs)/homepage");
+      }
+    },
+    onError(error) {
       handleAxiosError(error);
     },
   });

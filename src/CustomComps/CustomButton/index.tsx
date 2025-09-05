@@ -29,7 +29,7 @@ const CustomButton = ({
   style,
 }: ButtonType) => {
   const getBgColor = () => {
-    if (disabled) return "bg-divider";
+    if (disabled) return "bg-[#2E693945]";
     if (primary) return "bg-primary text-white";
     if (rounded) return "bg-primary text-white rounded-full";
     if (danger) return "bg-red";
