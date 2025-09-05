@@ -79,12 +79,13 @@ import Screen from "@/src/layout/Screen";
 import { rS, rV } from "@/src/lib/responsivehandler";
 import useAuthStore from "@/src/store/authStore";
 import {
-    AntDesign,
-    FontAwesome,
-    Ionicons,
-    MaterialCommunityIcons,
-    MaterialIcons,
+  AntDesign,
+  FontAwesome,
+  Ionicons,
+  MaterialCommunityIcons,
+  MaterialIcons,
 } from "@expo/vector-icons";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { useRouter } from "expo-router";
 import React from "react";
 import { Alert, Switch, Text, TouchableOpacity, View } from "react-native";
@@ -174,6 +175,8 @@ const SettingsScreen = () => {
     },
   ];
 
+  
+
   const handlelogout = () => {
     Alert.alert("Logout!", "Are you sure you want to logout?", [
       {
@@ -183,6 +186,7 @@ const SettingsScreen = () => {
       {
         text: "Ok",
         onPress: async () => {
+          await GoogleSignin.signOut();
           useAuthStore.getState().clearAuthState();
           router.replace("/(auth)/login");
         },

@@ -314,11 +314,11 @@ import CustomSelect from "@/src/CustomComps/CustomSelect";
 import Screen from "@/src/layout/Screen";
 import { rS, rV } from "@/src/lib/responsivehandler";
 import {
-    AntDesign,
-    EvilIcons,
-    Feather,
-    FontAwesome,
-    Ionicons,
+  AntDesign,
+  EvilIcons,
+  Feather,
+  FontAwesome,
+  Ionicons,
 } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
@@ -359,10 +359,11 @@ const EditProfileScreen = () => {
   const dataItem = [
     { title: "Female", value: "female" },
     { title: "Male", value: "male" },
-    { title: "Intersex", value: "Intersex" },
+    { title: "Others", value: "others" },
   ];
 
   console.log("getUserData:", getUserData?.data?.data);
+
 
   React.useEffect(() => {
     if (getUserData?.data) {
@@ -381,7 +382,7 @@ const EditProfileScreen = () => {
     editUserProfile.mutate({
       full_name: data.full_name || getUserData?.data?.data?.full_name,
       email: data.email || getUserData?.data?.data?.email,
-      phone_number: data.phone_number || getUserData?.data?.data?.phone_number,
+      phone_number: data.phone_number || getUserData?.data?.data?.phone_number || "2348056789034",
       region: data.region,
       bio: data.bio,
       gender: selected?.value || "",
@@ -389,6 +390,8 @@ const EditProfileScreen = () => {
   };
 
   const editUserProfile = useEditUser();
+  console.log("editUserProfile:", editUserProfile);
+
 
   return (
     <Screen scroll={true} className="">
@@ -432,7 +435,7 @@ const EditProfileScreen = () => {
               className="text-primary font-[PoppinsBold]"
               style={{ fontSize: rS(16) }}
             >
-              Namaha Chandra
+              {getUserData?.data?.data?.full_name}
             </Text>
             <TouchableOpacity>
               <Text
@@ -503,17 +506,17 @@ const EditProfileScreen = () => {
           <Controller
             control={control}
             name="phone_number"
-            rules={{
-              required: "Phone number is required",
-              minLength: {
-                value: 10,
-                message: "Phone Number must be at least 10 digits",
-              },
-              maxLength: {
-                value: 15,
-                message: "Phone Number must not exceed 15 digits",
-              },
-            }}
+            // rules={{
+            //   required: "Phone number is required",
+            //   minLength: {
+            //     value: 10,
+            //     message: "Phone Number must be at least 10 digits",
+            //   },
+            //   maxLength: {
+            //     value: 15,
+            //     message: "Phone Number must not exceed 15 digits",
+            //   },
+            // }}
             render={({
               field: { value, onChange, onBlur },
               fieldState: { error },

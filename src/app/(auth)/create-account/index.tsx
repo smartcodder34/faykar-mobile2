@@ -1,6 +1,7 @@
-import { useRegisterUser } from "@/src/api-services/authApi/authMutation";
+import { useRegisterSocialUser, useRegisterUser } from "@/src/api-services/authApi/authMutation";
 import CustomButton from "@/src/CustomComps/CustomButton";
 import CustomInput from "@/src/CustomComps/CustomInput";
+import LoadingOverlay from "@/src/CustomComps/LoadingOverlay";
 import Screen from "@/src/layout/Screen";
 import useAuthStore from "@/src/store/authStore";
 import { AntDesign, Feather } from "@expo/vector-icons";
@@ -24,6 +25,7 @@ const CreateAccount = () => {
   const setUserRegOtps = useAuthStore((state) => state.setUserRegOtps);
 
   const registerUser = useRegisterUser();
+  const registerSocialDetails = useRegisterSocialUser();
 
   const {
     control,
@@ -53,7 +55,7 @@ const CreateAccount = () => {
     }
   };
 
-  console.log("registerUser:", registerUser);
+  // console.log("registerUser:", registerUser);
 
   const signIn = async () => {
     try {
@@ -62,8 +64,16 @@ const CreateAccount = () => {
       if (isSuccessResponse(response)) {
         // setState({ userInfo: response.data });
         console.log("User Info --> ", response.data);
+        registerSocialDetails.mutate({
+          full_name: response.data?.user.name,
+          phone_number: "+2348109302800",
+          email: response.data?.user.email,
+          provider:"google"
+        });
       } else {
         // sign in was cancelled by user
+        console.log("sign in was cancelled by user");
+
       }
     } catch (error) {
       if (isErrorWithCode(error)) {
@@ -83,10 +93,25 @@ const CreateAccount = () => {
     }
   };
 
+  // const signOut = async () => {
+  //   try {
+  //     await GoogleSignin.signOut();
+  //     useAuthStore.getState().clearAuthState(); // Remember to remove the user from your app's state as well
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
+
   // console.log("testing1111: ", registerUser);
 
   return (
     <Screen scroll={true} className="">
+      <LoadingOverlay
+        isOpen={registerUser.isPending || registerSocialDetails.isPending} // Required: Controls visibility
+        message="Custom message" // Optional: Loading text
+        animationType="pulse" // Optional: "spin" | "pulse" | "bounce" | "fade"
+        backdropClassName="..." // Optional: Additional backdrop styling
+      />
       <View className=" flex-1 p-8">
         <Text className="font-[PlusJakartaSansSemiBold] text-xl my-3">
           Create Account
@@ -298,7 +323,7 @@ const CreateAccount = () => {
             //   router.push("/(auth)/create-account/verification");
             // }}
             onPress={handleSubmit(onSubmit)}
-            loading={registerUser.isPending}
+            loading={registerUser.isPending || registerSocialDetails.isPending}
             disabled={registerUser.isPending}
           />
 
@@ -307,6 +332,7 @@ const CreateAccount = () => {
             <Text
               className=" text-primary font-[PlusJakartaSansSemiBold]"
               onPress={() => router.push("/(auth)/login")}
+              // onPress={signOut}
             >
               Sign in
             </Text>

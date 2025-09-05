@@ -34,6 +34,7 @@ axiosInstance.interceptors.request.use(
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
+      console.log("token234", token);
       return config;
     } catch (error) {
       console.error("Error in request interceptor:", error);

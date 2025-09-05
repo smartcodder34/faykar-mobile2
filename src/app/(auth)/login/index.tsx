@@ -1,21 +1,27 @@
-import { useLoginUser } from "@/src/api-services/authApi/authMutation";
+import {
+  useLoginSocialUser,
+  useLoginUser,
+} from "@/src/api-services/authApi/authMutation";
 import ForgotPasswordSheet from "@/src/components/auth/ForgotPasswordSheet";
+import ResetPasswordSheet from "@/src/components/auth/ResetPasswordSheet";
 import BottomSheetScreen from "@/src/CustomComps/BottomSheetScreen";
 import CustomButton from "@/src/CustomComps/CustomButton";
 import CustomInput from "@/src/CustomComps/CustomInput";
+import LoadingOverlay from "@/src/CustomComps/LoadingOverlay";
 import Screen from "@/src/layout/Screen";
 import { AntDesign, Feather, Ionicons } from "@expo/vector-icons";
 import BottomSheet from "@gorhom/bottom-sheet";
+import {
+  GoogleSignin,
+  isErrorWithCode,
+  isSuccessResponse,
+  statusCodes,
+} from "@react-native-google-signin/google-signin";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import React, { useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
-import {
-  Keyboard,
-  Text,
-  TouchableOpacity,
-  View
-} from "react-native";
+import { Keyboard, Text, TouchableOpacity, View } from "react-native";
 
 const LoginScreen = () => {
   const router = useRouter();
@@ -42,6 +48,9 @@ const LoginScreen = () => {
   };
 
   const userLogin = useLoginUser();
+  const loginSocialDetails = useLoginSocialUser();
+
+  console.log("userLogin:", userLogin);
 
   // bottom sheet
   const snapPoints = useMemo(() => ["30%", "50%"], []);
@@ -51,8 +60,57 @@ const LoginScreen = () => {
   //close the bottom sheet
   const handleForgotPassswordOpen = () => forgotPasswordRef.current?.expand();
   const handleForgotPassswordClose = () => forgotPasswordRef.current?.close();
+
+  const resetPasswordRef = React.useRef<BottomSheet>(null);
+  //close the bottom sheet
+  const handleResetPassswordOpen = () => {
+    resetPasswordRef.current?.expand();
+    handleForgotPassswordClose();
+  };
+  const handleResetPassswordClose = () => resetPasswordRef.current?.close();
+
+  const signIn = async () => {
+    try {
+      await GoogleSignin.hasPlayServices();
+      const response = await GoogleSignin.signIn();
+      if (isSuccessResponse(response)) {
+        // setState({ userInfo: response.data });
+        console.log("User Info --> ", response.data);
+
+        loginSocialDetails.mutate({
+          email: response.data?.user.email,
+          provider: "google",
+        });
+      } else {
+        // sign in was cancelled by user
+        console.log("sign in was cancelled by user");
+      }
+    } catch (error) {
+      if (isErrorWithCode(error)) {
+        switch (error.code) {
+          case statusCodes.IN_PROGRESS:
+            // operation (eg. sign in) already in progress
+            break;
+          case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
+            // Android only, play services not available or outdated
+            break;
+          default:
+          // some other error happened
+        }
+      } else {
+        // an error that's not related to google sign in occurred
+      }
+    }
+  };
+
   return (
     <Screen scroll={true} className="">
+      <LoadingOverlay
+        isOpen={userLogin.isPending || loginSocialDetails.isPending} // Required: Controls visibility
+        message="Custom message" // Optional: Loading text
+        animationType="pulse" // Optional: "spin" | "pulse" | "bounce" | "fade"
+        backdropClassName="..." // Optional: Additional backdrop styling
+      />
       <View className=" flex-1 p-8">
         <Text className="font-[PlusJakartaSansSemiBold] text-xl my-3">
           Login
@@ -151,8 +209,6 @@ const LoginScreen = () => {
           </View>
         </View>
 
-       
-
         <View className="py-8">
           <CustomButton
             rounded
@@ -161,7 +217,7 @@ const LoginScreen = () => {
             //   router.push("/(auth)/create-account/verification");
             // }}
             onPress={handleSubmit(onSubmit)}
-            loading={userLogin.isPending}
+            loading={userLogin.isPending || loginSocialDetails.isPending}
             disabled={userLogin.isPending}
           />
           <Text className=" text-center my-3">
@@ -194,7 +250,7 @@ const LoginScreen = () => {
             />
           </TouchableOpacity>
 
-          <TouchableOpacity className=" w-16 h-16 mx-10">
+          <TouchableOpacity className=" w-16 h-16 mx-10" onPress={signIn}>
             <Image
               source={require("@/assets/images/google.png")}
               style={{
@@ -219,8 +275,23 @@ const LoginScreen = () => {
         message={
           <ForgotPasswordSheet
             // selectedDate={selectedDate}
-            // setSelectedDate={setSelectedDate}
+            handleResetPassswordOpen={handleResetPassswordOpen}
             handleForgotPassswordClose={handleForgotPassswordClose}
+          />
+        }
+      />
+
+      <BottomSheetScreen
+        snapPoints={snapPoints}
+        ref={resetPasswordRef}
+        isBackdropComponent={true}
+        enablePanDownToClose={true}
+        index={-1}
+        message={
+          <ResetPasswordSheet
+            // selectedDate={selectedDate}
+            // setSelectedDate={setSelectedDate}
+            handleResetPassswordClose={handleResetPassswordClose}
           />
         }
       />
