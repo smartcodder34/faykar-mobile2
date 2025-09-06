@@ -3,6 +3,7 @@ import OtpPin from "@/src/components/auth/OtpPin";
 import RegisterSuccessSheet from "@/src/components/auth/RegisterSuccessSheet";
 import BottomSheetScreen from "@/src/CustomComps/BottomSheetScreen";
 import CustomButton from "@/src/CustomComps/CustomButton";
+import LoadingOverlay from "@/src/CustomComps/LoadingOverlay";
 import Screen from "@/src/layout/Screen";
 import useAuthStore from "@/src/store/authStore";
 import { AntDesign } from "@expo/vector-icons";
@@ -45,9 +46,15 @@ const Verification = () => {
 
     const emailVerification = useVerifyEmail(handleVerifyBottomSheetOpen);
 
-
+console.log("emailVerification:", emailVerification);
   return (
     <Screen className=" ">
+      <LoadingOverlay
+        isOpen={emailVerification.isPending} // Required: Controls visibility
+        message="Custom message" // Optional: Loading text
+        animationType="pulse" // Optional: "spin" | "pulse" | "bounce" | "fade"
+        backdropClassName="..." // Optional: Additional backdrop styling
+      />
       <View className=" flex-row items-center justify-between p-8">
         <TouchableOpacity
           onPress={() => {
@@ -98,7 +105,12 @@ const Verification = () => {
       </View>
 
       <View className="p-8">
-        <CustomButton rounded title="Submit" onPress={handleVerifyEmail} />
+        <CustomButton
+          rounded
+          title="Submit"
+          loading={emailVerification.isPending}
+          onPress={handleVerifyEmail}
+        />
         <Text className="text-center my-2">
           Didn’t received the code? Resend
         </Text>

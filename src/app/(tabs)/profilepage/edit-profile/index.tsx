@@ -304,19 +304,17 @@
 
 // export default EditProfileScreen;
 
-
-
 import { useEditUser } from "@/src/api-services/authApi/authMutation";
 import { useGetUserApi } from "@/src/api-services/authApi/authQuery";
 import CustomButton from "@/src/CustomComps/CustomButton";
 import CustomInput from "@/src/CustomComps/CustomInput";
 import CustomSelect from "@/src/CustomComps/CustomSelect";
+import LoadingOverlay from "@/src/CustomComps/LoadingOverlay";
 import Screen from "@/src/layout/Screen";
 import { rS, rV } from "@/src/lib/responsivehandler";
 import {
   AntDesign,
   EvilIcons,
-  Feather,
   FontAwesome,
   Ionicons,
 } from "@expo/vector-icons";
@@ -331,6 +329,12 @@ interface Item {
   value: string;
   price?: string;
 }
+
+ const dataItem = [
+   { title: "Female", value: "female" },
+   { title: "Male", value: "male" },
+   { title: "Others", value: "others" },
+ ];
 
 const EditProfileScreen = () => {
   const router = useRouter();
@@ -356,24 +360,25 @@ const EditProfileScreen = () => {
     },
   });
 
-  const dataItem = [
-    { title: "Female", value: "female" },
-    { title: "Male", value: "male" },
-    { title: "Others", value: "others" },
-  ];
+ 
 
   console.log("getUserData:", getUserData?.data?.data);
 
+  console.log("selected:", selected);
 
   React.useEffect(() => {
     if (getUserData?.data) {
+      const userData = getUserData.data.data.gender;
       reset({
         full_name: getUserData?.data?.data?.full_name,
-        phone_number: getUserData?.data?.data?.phone_number?.toString() || "",
         email: getUserData?.data?.data?.email,
         bio: getUserData?.data?.data?.bio || "",
         region: getUserData?.data?.data?.region || "",
       });
+      const matchingGender = dataItem.find(
+        (item) => item.value === userData
+      );
+      setSelected(matchingGender || null);
     }
   }, [getUserData?.data, reset]);
 
@@ -382,9 +387,8 @@ const EditProfileScreen = () => {
     editUserProfile.mutate({
       full_name: data.full_name || getUserData?.data?.data?.full_name,
       email: data.email || getUserData?.data?.data?.email,
-      phone_number: data.phone_number || getUserData?.data?.data?.phone_number || "2348056789034",
-      region: data.region,
-      bio: data.bio,
+      region: data.region || getUserData?.data?.data?.region,
+      bio: data.bio || getUserData?.data?.data?.bio,
       gender: selected?.value || "",
     });
   };
@@ -392,9 +396,14 @@ const EditProfileScreen = () => {
   const editUserProfile = useEditUser();
   console.log("editUserProfile:", editUserProfile);
 
-
   return (
     <Screen scroll={true} className="">
+      <LoadingOverlay
+        isOpen={editUserProfile.isPending} // Required: Controls visibility
+        message="Custom message" // Optional: Loading text
+        animationType="pulse" // Optional: "spin" | "pulse" | "bounce" | "fade"
+        backdropClassName="..." // Optional: Additional backdrop styling
+      />
       {/* Header */}
       <View className="flex-row items-center justify-between p-4 bg-white">
         <TouchableOpacity onPress={() => router.back()}>
@@ -499,46 +508,6 @@ const EditProfileScreen = () => {
                     <AntDesign name="mail" size={24} color="#2E6939" />
                   </View>
                 }
-              />
-            )}
-          />
-
-          <Controller
-            control={control}
-            name="phone_number"
-            // rules={{
-            //   required: "Phone number is required",
-            //   minLength: {
-            //     value: 10,
-            //     message: "Phone Number must be at least 10 digits",
-            //   },
-            //   maxLength: {
-            //     value: 15,
-            //     message: "Phone Number must not exceed 15 digits",
-            //   },
-            // }}
-            render={({
-              field: { value, onChange, onBlur },
-              fieldState: { error },
-            }) => (
-              <CustomInput
-                label="Phone Number"
-                primary
-                placeholder="+4456664440"
-                keyboardType={"numeric"}
-                value={value}
-                onChangeText={(text: any) => {
-                  if (text?.length <= 15) {
-                    onChange(text);
-                  }
-                }}
-                error={errors?.phone_number?.message}
-                icon={
-                  <View className="mx-3">
-                    <Feather name="phone" size={24} color="#2E6939" />
-                  </View>
-                }
-                iconPostion="left"
               />
             )}
           />

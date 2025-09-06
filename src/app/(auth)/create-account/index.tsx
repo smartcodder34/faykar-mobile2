@@ -102,7 +102,7 @@ const CreateAccount = () => {
   //   }
   // };
 
-  // console.log("testing1111: ", registerUser);
+  console.log("testing1111: ", registerUser);
 
   return (
     <Screen scroll={true} className="">
@@ -156,12 +156,12 @@ const CreateAccount = () => {
               rules={{
                 required: "Phone number is required",
                 minLength: {
-                  value: 10,
+                  value: 14,
                   message: "Phone Number must be 12 digits",
                 },
                 maxLength: {
-                  value: 12,
-                  message: "Phone Number must not exceed 12 digits",
+                  value: 14,
+                  message: "Phone Number must not exceed 14 digits",
                 },
               }}
               render={({
@@ -169,14 +169,14 @@ const CreateAccount = () => {
                 fieldState: { error },
               }) => (
                 <CustomInput
-                  label="Phone Number."
+                  label="Phone Number"
                   primary
                   placeholder="+4456664440"
                   keyboardType={"numeric"}
                   value={value}
                   // onChangeText={onChange}
                   onChangeText={(text: any) => {
-                    if (text?.length <= 12) {
+                    if (text?.length <= 14) {
                       onChange(text);
                     }
                   }}

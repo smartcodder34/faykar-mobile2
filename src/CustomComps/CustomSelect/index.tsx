@@ -136,6 +136,8 @@ const CustomSelect: React.FC<Props> = ({
     if (whiteBg) return "bg-[#ffffff] border border-divider";
   };
 
+  console.log("selected555", selected);
+
   return (
     <>
       {label && (

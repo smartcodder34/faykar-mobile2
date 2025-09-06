@@ -4,6 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
+import Toast from "react-native-toast-message";
 import {
   EditUserDetails,
   forgotPasswordApi,
@@ -29,6 +30,7 @@ export const useRegisterUser = () => {
       router.push("/(auth)/create-account/verification");
     },
     onError(error: any) {
+      console.log("error55", error?.response.data.message)
       handleAxiosError(error);
     },
   });
@@ -45,6 +47,11 @@ export const useVerifyEmail = (handleVerifyBottomSheetOpen: () => void) => {
     },
     onError(error: any) {
       handleAxiosError(error);
+       Toast.show({
+         type: "error",
+         text1: error,
+       });
+      
     },
   });
 };
