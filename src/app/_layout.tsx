@@ -7,10 +7,12 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 import "../../global.css";
 import NetworkStatus from "../components/NetworkStatus";
 import { useAppFocusManager } from "../lib/focusManager";
 import { setupNetworkStatus } from "../lib/networkManager";
+import toastConfig from "../lib/toastConfig";
 import useAuthStore from "../store/authStore";
 
 
@@ -94,6 +96,8 @@ export default function RootLayout() {
               </Stack.Protected>
             </Stack>
             <StatusBar style="auto" />
+            <Toast config={toastConfig} />
+            <Toast />
           </GestureHandlerRootView>
         </SafeAreaProvider>
       </QueryClientProvider>
