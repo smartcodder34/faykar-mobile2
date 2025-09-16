@@ -75,6 +75,7 @@
 // export default ProfilePage;
 
 
+import { useGetUserApi } from "@/src/api-services/authApi/authQuery";
 import CustomButton from "@/src/CustomComps/CustomButton";
 import Screen from "@/src/layout/Screen";
 import { rS, rV } from "@/src/lib/responsivehandler";
@@ -86,6 +87,7 @@ import { FlatList, Text, TouchableOpacity, View } from "react-native";
 
 const ProfilePage = () => {
   const router = useRouter();
+   const getUserData = useGetUserApi();
 
   // Mock data for the image grid
   const posts = [
@@ -119,7 +121,7 @@ const ProfilePage = () => {
   );
 
   return (
-    <Screen  className="">
+    <Screen className="">
       {/* Header */}
       <View className="flex-row items-center justify-between p-4 bg-white">
         <TouchableOpacity onPress={() => router.back()}>
@@ -166,7 +168,7 @@ const ProfilePage = () => {
               className="text-primary font-[PoppinsBold]"
               style={{ fontSize: rS(16) }}
             >
-              Namaha Chandra
+              {getUserData?.data?.data?.full_name}
             </Text>
             <Text
               className="font-[PoppinsSemiBold] text-gray-600"
@@ -190,9 +192,13 @@ const ProfilePage = () => {
 
         {/* Edit Profile Button */}
         <View className="mb-4">
-          <CustomButton primary title="Edit Profile" onPress={()=>{
-            router.push("/profilepage/edit-profile")
-          }} />
+          <CustomButton
+            primary
+            title="Edit Profile"
+            onPress={() => {
+              router.push("/profilepage/edit-profile");
+            }}
+          />
         </View>
 
         {/* Stats Section */}

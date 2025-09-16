@@ -362,10 +362,6 @@ const EditProfileScreen = () => {
 
  
 
-  console.log("getUserData:", getUserData?.data?.data);
-
-  console.log("selected:", selected);
-
   React.useEffect(() => {
     if (getUserData?.data) {
       const userData = getUserData.data.data.gender;

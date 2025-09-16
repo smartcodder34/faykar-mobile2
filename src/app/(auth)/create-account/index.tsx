@@ -157,7 +157,7 @@ const CreateAccount = () => {
                 required: "Phone number is required",
                 minLength: {
                   value: 14,
-                  message: "Phone Number must be 12 digits",
+                  message: "Phone Number must be 14 digits",
                 },
                 maxLength: {
                   value: 14,
@@ -172,7 +172,7 @@ const CreateAccount = () => {
                   label="Phone Number"
                   primary
                   placeholder="+4456664440"
-                  keyboardType={"numeric"}
+                  // keyboardType={"numeric"}
                   value={value}
                   // onChangeText={onChange}
                   onChangeText={(text: any) => {
