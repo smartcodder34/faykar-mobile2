@@ -1,124 +1,23 @@
-// import CustomButton from "@/src/CustomComps/CustomButton";
-// import Screen from "@/src/layout/Screen";
-// import { Ionicons } from "@expo/vector-icons";
-// import { Image } from "expo-image";
-// import { useRouter } from "expo-router";
-// import React from "react";
-// import { Text, TouchableOpacity, View } from "react-native";
-
-// const ProfilePage = () => {
-//   const router = useRouter();
-
-//   return (
-//     <Screen className="p-8">
-//       <View className=" flex-row items-center justify-between ">
-//         <TouchableOpacity onPress={() => {}}>
-//           <Ionicons name="chevron-back" size={24} color="#2E6939" />
-//         </TouchableOpacity>
-//         <View>
-//           <Text className="font-[InterSemiBold] text-2xl text-primary">
-//             Profile
-//           </Text>
-//         </View>
-
-//         <View />
-//       </View>
-
-//       <View className=" pt-8 flex-row items-center justify-between my-5">
-//         <View className=" flex-row items-center">
-//           <View className=" rounded-full" style={{ width: 71, height: 71 }}>
-//             <Image
-//               source={require("@/assets/images/profile-img.jpg")}
-//               style={{
-//                 height: "100%",
-//                 width: "100%",
-//                 // alignSelf: "center",
-//                 borderRadius: 100,
-//               }}
-//               contentFit="cover"
-//               onError={(error) => console.log("Image error:", error)}
-//             />
-//           </View>
-
-//           <View className=" mx-5">
-//             <Text className=" text-xl text-primary font-[PoppinsBold]">
-//               Namaha Chandra
-//             </Text>
-//             <Text className=" text-sm font-[PoppinsSemiBold]">
-//               Arsenal, London
-//             </Text>
-//           </View>
-//         </View>
-
-//         <TouchableOpacity
-//           onPress={() => {
-//             router.push("/profilepage/settings");
-//           }}
-//         >
-//           <Ionicons name="settings-outline" size={24} color="#2E6939" />
-//         </TouchableOpacity>
-//       </View>
-//       <View className=" mb-5">
-//         <Text className=" text-sm font-[PoppinsMedium]">
-//           I’m a postive person. I love to travel and eat Always available for
-//           chat
-//         </Text>
-//       </View>
-
-//       <View className="">
-//         <CustomButton primary title="Edit Profile" />
-//       </View>
-//     </Screen>
-//   );
-// };
-
-// export default ProfilePage;
-
-
 import { useGetUserApi } from "@/src/api-services/authApi/authQuery";
+import { useGetUserProducts } from "@/src/api-services/productsApi/productQuery";
+import EmptyState from "@/src/components/EmptyState";
+import PostsGrid from "@/src/components/profileScreen/PostsGrid";
 import CustomButton from "@/src/CustomComps/CustomButton";
 import Screen from "@/src/layout/Screen";
 import { rS, rV } from "@/src/lib/responsivehandler";
+import { getInitials } from "@/src/utils/getInitials";
 import { Ionicons } from "@expo/vector-icons";
-import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import React from "react";
-import { FlatList, Text, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 
 const ProfilePage = () => {
   const router = useRouter();
-   const getUserData = useGetUserApi();
+  const getUserData = useGetUserApi();
+  const getUserProducts = useGetUserProducts();
+  const userProducts = getUserProducts?.data?.data?.products || [];
 
-  // Mock data for the image grid
-  const posts = [
-    { id: "1", image: require("@/assets/images/post1.png") },
-    { id: "2", image: require("@/assets/images/post2.png") },
-    { id: "3", image: require("@/assets/images/post1.png") },
-    { id: "4", image: require("@/assets/images/post2.png") },
-    { id: "5", image: require("@/assets/images/post1.png") },
-    { id: "6", image: require("@/assets/images/post2.png") },
-    { id: "7", image: require("@/assets/images/post1.png") },
-    { id: "8", image: require("@/assets/images/post2.png") },
-    { id: "9", image: require("@/assets/images/post1.png") },
-    { id: "10", image: require("@/assets/images/post1.png") },
-    { id: "11", image: require("@/assets/images/post2.png") },
-    { id: "12", image: require("@/assets/images/post1.png") },
-  ];
-
-  const renderPostItem = ({ item }: { item: any }) => (
-    <TouchableOpacity className="flex-1 m-0.5" style={{ aspectRatio: 1 }}>
-      <Image
-        source={item.image}
-        style={{
-          width: "100%",
-          height: "100%",
-          borderRadius: 8,
-        }}
-        contentFit="cover"
-        onError={(error) => console.log("Image error:", error)}
-      />
-    </TouchableOpacity>
-  );
+  console.log("userProducts2000:", userProducts);
 
   return (
     <Screen className="">
@@ -148,10 +47,10 @@ const ProfilePage = () => {
       <View className="px-4 py-2 bg-white">
         <View className="flex-row items-center mb-4">
           <View
-            className="rounded-full"
+            className="rounded-full items-center justify-center bg-slate-200"
             style={{ width: rV(70), height: rV(70) }}
           >
-            <Image
+            {/* <Image
               source={require("@/assets/images/profile-img.jpg")}
               style={{
                 height: "100%",
@@ -160,7 +59,10 @@ const ProfilePage = () => {
               }}
               contentFit="cover"
               onError={(error) => console.log("Image error:", error)}
-            />
+            /> */}
+            <Text className=" font-[PoppinsSemiBold] text-3xl">
+              {getInitials(getUserData?.data?.data?.full_name)}
+            </Text>
           </View>
 
           <View className="ml-4 flex-1">
@@ -174,7 +76,7 @@ const ProfilePage = () => {
               className="font-[PoppinsSemiBold] text-gray-600"
               style={{ fontSize: rS(12) }}
             >
-              Arsenal, London
+              {getUserData?.data?.data?.email}
             </Text>
           </View>
         </View>
@@ -185,8 +87,9 @@ const ProfilePage = () => {
             className="font-[PoppinsMedium] text-gray-700"
             style={{ fontSize: rS(12) }}
           >
-            I'm a positive person. I love to travel and eat{"\n"}Always
-            available for chat
+            {
+              "I'm a positive person. I love to travel and eat Always available for chat"
+            }
           </Text>
         </View>
 
@@ -262,15 +165,11 @@ const ProfilePage = () => {
 
       {/* Posts Grid */}
       <View className="flex-1 bg-white px-4">
-        <FlatList
-          data={posts}
-          renderItem={renderPostItem}
-          numColumns={3}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 20 }}
-          columnWrapperStyle={{ justifyContent: "space-between" }}
-          ItemSeparatorComponent={() => <View style={{ height: 2 }} />}
-        />
+        {userProducts.length === 0 ? (
+          <EmptyState />
+        ) : (
+          <PostsGrid userProducts={userProducts} />
+        )}
       </View>
     </Screen>
   );

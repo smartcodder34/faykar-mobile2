@@ -50,7 +50,6 @@ const LoginScreen = () => {
   const userLogin = useLoginUser();
   const loginSocialDetails = useLoginSocialUser();
 
-  console.log("userLogin:", userLogin);
 
   // bottom sheet
   const snapPoints = useMemo(() => ["30%", "50%"], []);

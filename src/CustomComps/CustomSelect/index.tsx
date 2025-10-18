@@ -1,86 +1,4 @@
-// import { View, Text, TouchableOpacity, ScrollView } from "react-native";
-// import React from "react";
-// import { AntDesign } from "@expo/vector-icons";
-// import { Image } from "react-native";
 
-// type Props = {
-//   label?: string;
-//   setOpenDropDown?: (openDropDown: boolean) => void;
-//   openDropDown?: boolean;
-//   selected?: string | null;
-//   placeholder?: string;
-//   onPress?: () => void;
-//   dataItem:any;
-// };
-
-// const CustomRegisterSelect = ({
-//   label,
-//   setOpenDropDown,
-//   openDropDown,
-//   selected,
-//   placeholder,
-//   onPress,
-//   dataItem,
-// }: Props) => {
-//   return (
-//     <>
-//       {label && <Text className="text-xs font-[Urbanist]  my-2">{label}</Text>}
-//       <TouchableOpacity
-//         className="h-14 bg-[#F5F5F5]  rounded-xl justify-center p-3 mb-5"
-//         onPress={() => {
-//           setOpenDropDown?.(!openDropDown);
-//         }}
-//         // onPress={toggleDropDown}
-//       >
-//         <View className="flex-row items-center justify-between">
-//           <Text className="font-[400] text-sm text-[#23232399]  font-[Urbanist] leading-[13]">
-//             {/* {selected
-//               ? `${selected.carrier_name} - ${selected.delivery_time}`
-//               : `${itemSelected}`} */}
-//             {selected ? selected : placeholder}
-//           </Text>
-//           {selected ? null : (
-//             <View className="">
-//               <AntDesign name="caretdown" size={16} color="#1E1D2F" />
-//             </View>
-//           )}
-//         </View>
-//       </TouchableOpacity>
-//       {openDropDown && (
-//         <ScrollView
-//           className="border border-[#E8E8E8] bg-white p-3  rounded-lg h-auto "
-//           nestedScrollEnabled={true}
-//           style={{ maxHeight: 200 }}
-//         >
-//           {dataItem.map((item: any) => (
-//             <TouchableOpacity
-//               className="flex-row items-center justify-between my-1"
-//               onPress={onPress}
-//             >
-//               <View>
-//                 <Text className="font-[400] text-xs  font-[Urbanist]">
-//                   {item?.value}
-//                 </Text>
-//                 <Text className="font-[400] text-xs  font-[Urbanist]">
-//                   {item?.price && item?.price}
-//                 </Text>
-//               </View>
-
-//               {/* <View className="h-[40px] w-[40px]  rounded-full">
-//               <Image
-//                 source={{ uri: image }}
-//                 style={{ width: "100%", height: "100%" }}
-//               />
-//             </View> */}
-//             </TouchableOpacity>
-//           ))}
-//         </ScrollView>
-//       )}
-//     </>
-//   );
-// };
-
-// export default CustomRegisterSelect;
 
 import { rS, rV } from "@/src/lib/responsivehandler";
 import { AntDesign } from "@expo/vector-icons";
@@ -136,7 +54,7 @@ const CustomSelect: React.FC<Props> = ({
     if (whiteBg) return "bg-[#ffffff] border border-divider";
   };
 
-  console.log("selected555", selected);
+
 
   return (
     <>
