@@ -134,7 +134,7 @@ const ResetPasswordSheet = ({ handleForgotPassswordClose }: any) => {
                       setComPassIsSecureEntry(!comPassIsSecureEntry);
                     }}
                   >
-                    {isSecureEntry ? (
+                    {comPassIsSecureEntry ? (
                       <Feather name="eye-off" size={24} color="#717171" />
                     ) : (
                       <Feather name="eye" size={24} color="#717171" />
