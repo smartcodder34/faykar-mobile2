@@ -1,8 +1,28 @@
 import { FontAwesome5, Ionicons } from "@expo/vector-icons";
+import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 import { Tabs } from "expo-router";
 import { Platform } from "react-native";
 
 export default function TabsLayout() {
+  // Function to determine if tab bar should be hidden
+  function getTabBarVisibility(route: any) {
+    const routeName = getFocusedRouteNameFromRoute(route) ?? "index";
+
+    // Hide tab bar for these specific routes
+    const hiddenRoutes = [
+      "chat-room",
+     
+    ];
+
+    // Check if the current route or any part of it matches hidden routes
+    const shouldHide = hiddenRoutes.some(
+      (hiddenRoute) =>
+        routeName.includes(hiddenRoute) ||
+        route?.params?.screen?.includes(hiddenRoute)
+    );
+
+    return shouldHide;
+  }
   return (
     <Tabs
       initialRouteName="homepage"
@@ -21,7 +41,17 @@ export default function TabsLayout() {
     >
       <Tabs.Screen
         name="homepage"
-        options={{
+        // options={{
+        //   title: "Home",
+        //   tabBarIcon: ({ color, focused }) => (
+        //     <Ionicons
+        //       name={focused ? "home" : "home"}
+        //       size={24}
+        //       color={focused ? "#2E6939" : "#B8B4B4"}
+        //     />
+        //   ),
+        // }}
+        options={({ route }) => ({
           title: "Home",
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
@@ -30,7 +60,16 @@ export default function TabsLayout() {
               color={focused ? "#2E6939" : "#B8B4B4"}
             />
           ),
-        }}
+          // Use the same tab bar visibility logic as homepage
+          tabBarStyle: getTabBarVisibility(route)
+            ? { display: "none" }
+            : Platform.select({
+                ios: {
+                  position: "absolute",
+                },
+                default: {},
+              }),
+        })}
       />
       <Tabs.Screen
         name="messagepage/index"

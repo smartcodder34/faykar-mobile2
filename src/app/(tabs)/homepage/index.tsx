@@ -1,3 +1,4 @@
+import { useGetUserApi } from "@/src/api-services/authApi/authQuery";
 import { useLikeProductMutation } from "@/src/api-services/productsApi/productMutation";
 import { useGetProducts } from "@/src/api-services/productsApi/productQuery";
 import { useLocation } from "@/src/hooks/useLocation";
@@ -24,17 +25,16 @@ const Homepage = () => {
   const router = useRouter();
   const { location, address } = useLocation();
   const getAllProducts = useGetProducts();
+    const getUserData = useGetUserApi();
+  
   const likeProduct = useLikeProductMutation();
 
   const setUserLocation = useGetLocation().setUserLocation;
 
   const allProducts = getAllProducts?.data?.data?.products || [];
 
-  console.log("address in homepage:", address);
-  console.log(
-    "location in getAllProducts:",
-    getAllProducts?.data?.data?.products
-  );
+const currentUserId = getUserData.data?.data?.id;
+ 
 
   React.useEffect(() => {
     if (location)
@@ -50,10 +50,17 @@ const Homepage = () => {
   };
 
   const handleViewProduct = (productId: string) => {
-     router.push({
-       pathname: `/(tabs)/homepage/comments`,
-       params: { item: JSON.stringify(productId) },
-     });
+    router.push({
+      pathname: `/(tabs)/homepage/comments`,
+      params: { item: JSON.stringify(productId) },
+    });
+  };
+
+  const handleOpenChatRoom = (message: any) => {
+    router.push({
+      pathname: `/(tabs)/homepage/direct-message/chat-room`,
+      params: { item: JSON.stringify(message) },
+    });
   };
 
   const handleDirectMesaage = (productDetails: string) => {
@@ -326,16 +333,20 @@ const Homepage = () => {
                   </TouchableOpacity>
                 </View>
 
-                <Text className="text-sm text-gray-500">
-                  13.5KM... 54mins 
-                </Text>
+                <Text className="text-sm text-gray-500">13.5KM... 54mins</Text>
 
-                <TouchableOpacity className="bg-primary px-3 py-1 rounded-full flex-row items-center" onPress={()=>router.push("/homepage/direct-message")}>
-                  <Ionicons name="person-outline" size={14} color="white" />
-                  <Text className="text-white text-xs font-medium ml-1">
-                    Direct Message
-                  </Text>
-                </TouchableOpacity>
+                {item.seller?.id === currentUserId ? null : (
+                  <TouchableOpacity
+                    className={`bg-primary px-3 py-1 rounded-full flex-row items-center `}
+                    // onPress={() => router.push("/homepage/direct-message")}
+                    onPress={() => handleOpenChatRoom(item)}
+                  >
+                    <Ionicons name="person-outline" size={14} color="white" />
+                    <Text className="text-white text-xs font-medium ml-1">
+                      Direct Message
+                    </Text>
+                  </TouchableOpacity>
+                )}
               </View>
 
               {/* Post Details */}

@@ -71,7 +71,7 @@ const CreateProduct = () => {
 
   const userLocation = useGetLocation().userLocation;
 
-  console.log("userLocation from create product:", userLocation);
+  // console.log("userLocation from create product:", userLocation);
 
   //category 1 data from api
   const newProductCategory = getProductCategories?.data?.data?.categories.map(
