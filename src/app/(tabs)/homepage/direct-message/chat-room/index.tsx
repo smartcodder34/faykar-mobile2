@@ -53,57 +53,57 @@
 //       : { name: "Abdul Quay" };
 //   }, [params.item]);
 
-//   useEffect(() => {
-//     createRoomIfNotExists();
+  // useEffect(() => {
+  //   createRoomIfNotExists();
 
-//     let roomId = getRoomId(currentUserId, newData.seller?.id);
-//     const docRef = doc(db, "rooms", roomId);
-//     const messageRef = collection(docRef, "messages");
-//     const q = query(messageRef, orderBy("createdAt", "asc"));
-//     let unsub = onSnapshot(q, (snapshot) => {
-//       let allMessages = snapshot.docs.map((doc) => {
-//         return doc.data();
-//       });
-//       setMessages([...allMessages]);
-//     });
+  //   let roomId = getRoomId(currentUserId, newData.seller?.id);
+  //   const docRef = doc(db, "rooms", roomId);
+  //   const messageRef = collection(docRef, "messages");
+  //   const q = query(messageRef, orderBy("createdAt", "asc"));
+  //   let unsub = onSnapshot(q, (snapshot) => {
+  //     let allMessages = snapshot.docs.map((doc) => {
+  //       return doc.data();
+  //     });
+  //     setMessages([...allMessages]);
+  //   });
 
-//     return unsub;
-//   }, [currentUserId, newData.seller?.id]);
+  //   return unsub;
+  // }, [currentUserId, newData.seller?.id]);
 
 //   console.log("Messages:", messages);
 
-//   const createRoomIfNotExists = async () => {
-//     // Logic to create chat room if it doesn't exist
-//     let roomId = getRoomId(currentUserId, newData.seller?.id);
-//     console.log("Room ID:", roomId);
+  // const createRoomIfNotExists = async () => {
+  //   // Logic to create chat room if it doesn't exist
+  //   let roomId = getRoomId(currentUserId, newData.seller?.id);
+  //   console.log("Room ID:", roomId);
 
-//     await setDoc(doc(db, "rooms", roomId), {
-//       roomId,
-//       createdAt: Timestamp.fromDate(new Date()),
-//     });
-//   };
+  //   await setDoc(doc(db, "rooms", roomId), {
+  //     roomId,
+  //     createdAt: Timestamp.fromDate(new Date()),
+  //   });
+  // };
 
-//   const handleMessages = async (data: any) => {
-//     try {
-//       let roomId = getRoomId(currentUserId, newData.seller?.id);
-//       const docRef = doc(db, "rooms", roomId);
-//       const messageRef = collection(docRef, "messages");
-//       await addDoc(messageRef, {
-//         text: data.text,
-//         senderId: currentUserId,
-//         receiverName: newData.seller?.full_name,
-//         receiverId: newData.seller?.id,
-//         timestamp: Timestamp.fromDate(new Date()),
-//         createdAt: Timestamp.fromDate(new Date()),
-//       });
-//       // console.log("Message sent with ID: ", newDoc.id);
-//       // Clear the input after successful send
-//       reset();
-//     } catch (error) {
-//       console.error("Error sending message: ", error);
-//       Alert.alert("Error", "Failed to send message.");
-//     }
-//   };
+  // const handleMessages = async (data: any) => {
+  //   try {
+  //     let roomId = getRoomId(currentUserId, newData.seller?.id);
+  //     const docRef = doc(db, "rooms", roomId);
+  //     const messageRef = collection(docRef, "messages");
+  //     await addDoc(messageRef, {
+  //       text: data.text,
+  //       senderId: currentUserId,
+  //       receiverName: newData.seller?.full_name,
+  //       receiverId: newData.seller?.id,
+  //       timestamp: Timestamp.fromDate(new Date()),
+  //       createdAt: Timestamp.fromDate(new Date()),
+  //     });
+  //     // console.log("Message sent with ID: ", newDoc.id);
+  //     // Clear the input after successful send
+  //     reset();
+  //   } catch (error) {
+  //     console.error("Error sending message: ", error);
+  //     Alert.alert("Error", "Failed to send message.");
+  //   }
+  // };
 
 //   return (
 //     <Screen className="bg-white" scroll={true}>
@@ -244,6 +244,8 @@ const ChatRoom = () => {
     if (!currentUserId || !newData.seller?.id) return null;
     return getRoomId(currentUserId, newData.seller.id);
   }, [currentUserId, newData.seller?.id]);
+
+  console.log("roomId", roomId);
 
   // Setup chat room and listener
   useEffect(() => {

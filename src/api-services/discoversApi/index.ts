@@ -11,10 +11,23 @@ export const discoverProduct = async () => {
   }
 };
 
-export const discoverAccount = async () => {
+export const discoverCategory = async (data:any) => {
+  console.log(data, "databbb");
   try {
     const res = await axiosInstance.get(
-      `/discovers/account?account_query=codedev85`
+      `/discovers/category?term=${data.title}&category_id=${data.value}`
+    );
+    return res.data;
+  } catch (error) {
+    console.error("discover catagory", error);
+    throw error;
+  }
+};
+// {{APP_URL}}/discovers/:category?term=electronics&category_id=01K65DFRND96GX518C8DD6G4VW
+export const discoverAccount = async (data:string) => {
+  try {
+    const res = await axiosInstance.get(
+      `/discovers/accounts?account_query=${data}`
     );
     return res.data;
   } catch (error) {
@@ -23,14 +36,22 @@ export const discoverAccount = async () => {
   }
 };
 
-export const discoverCategory = async () => {
+export const recentlySearched = async () => {
   try {
-    const res = await axiosInstance.get(
-      `/discovers/account?account_query=codedev85`
-    );
+    const res = await axiosInstance.get(`/discovers/recently/searched`);
     return res.data;
   } catch (error) {
-    console.error("discover Account", error);
+    console.error("recently searched", error);
+    throw error;
+  }
+};
+
+export const popularSearched = async () => {
+  try {
+    const res = await axiosInstance.get(`/discovers/popular/searched`);
+    return res.data;
+  } catch (error) {
+    console.error("popular searched", error);
     throw error;
   }
 };

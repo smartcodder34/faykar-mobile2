@@ -1,78 +1,25 @@
-// import React from 'react'
-// import { Text, View } from 'react-native'
+import { useDiscoverAccount, useRecentlySearched } from "@/src/api-services/discoversApi/discoverQuery";
+import { getInitials } from "@/src/utils/getInitials";
+import React from "react";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
-// const AccountsScreen = () => {
-//   return (
-//     <View>
-//       <Text>AccountsScreen</Text>
-//     </View>
-//   )
-// }
+const AccountsScreen = ({ searchQuery }: any) => {
+  const getRecentlySearched = useRecentlySearched();
+  const getSearchAccount = useDiscoverAccount(searchQuery);
 
-// export default AccountsScreen
+  React.useEffect(() => {
+    getSearchAccount.refetch();
+  }, [searchQuery]);
 
-import React, { useState } from "react";
-import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+  console.log("getAccount30000000", getSearchAccount?.data?.data?.users);
+  // const resentlySearchUser = getRecentlySearched?.data?.data?.users;
+  const resentlySearchUser = getSearchAccount?.data?.data?.users;
 
-const AccountsScreen = () => {
-  const [recentAccounts, setRecentAccounts] = useState([
-    {
-      id: 1,
-      name: "Patrick",
-      time: "Just Now",
-      avatar: "https://i.pravatar.cc/150?img=1",
-    },
-    {
-      id: 2,
-      name: "Chris",
-      time: "2mins ago",
-      avatar: "https://i.pravatar.cc/150?img=2",
-    },
-    {
-      id: 3,
-      name: "Seguni WOWOW",
-      time: "15mins ago",
-      avatar: "https://i.pravatar.cc/150?img=3",
-    },
-    {
-      id: 4,
-      name: "Olam Azurit",
-      time: "1hour ago",
-      avatar: "https://i.pravatar.cc/150?img=4",
-    },
-    {
-      id: 5,
-      name: "Patrick",
-      time: "Just Now",
-      avatar: "https://i.pravatar.cc/150?img=5",
-    },
-    {
-      id: 6,
-      name: "Chris",
-      time: "2mins ago",
-      avatar: "https://i.pravatar.cc/150?img=6",
-    },
-    {
-      id: 7,
-      name: "Seguni WOWOW",
-      time: "15mins ago",
-      avatar: "https://i.pravatar.cc/150?img=7",
-    },
-    {
-      id: 8,
-      name: "Olam Azurit",
-      time: "1hour ago",
-      avatar: "https://i.pravatar.cc/150?img=8",
-    },
-  ]);
-
-  const handleRemove = (id:any) => {
-    setRecentAccounts(recentAccounts.filter((account) => account.id !== id));
+  const handleRemove = (id: any) => {
+    // setRecentAccounts(recentAccounts.filter((account) => account.id !== id));
   };
 
-  const handleClearAll = () => {
-    setRecentAccounts([]);
-  };
+  const handleClearAll = () => {};
 
   return (
     <View className="bg-white flex-1">
@@ -86,29 +33,34 @@ const AccountsScreen = () => {
 
       {/* Recent Accounts List */}
       <ScrollView className="px-5">
-        {recentAccounts.length > 0 ? (
-          recentAccounts.map((account, index) => (
-            <View
+        {resentlySearchUser?.length > 0 ? (
+          resentlySearchUser.map((account: any, index: number) => (
+            <TouchableOpacity
               key={account.id}
               className={`flex-row items-center justify-between py-3 ${
-                index !== recentAccounts.length - 1
+                index !== resentlySearchUser?.length - 1
                   ? "border-b border-gray-100"
                   : ""
               }`}
             >
               <View className="flex-row items-center gap-3">
                 {/* Avatar */}
-                <Image
+                {/* <Image
                   source={{ uri: account.avatar }}
                   className="w-12 h-12 rounded-full bg-gray-200"
-                />
+                /> */}
+                <View className=" w-10 h-10 bg-slate-200 rounded-full items-center justify-center">
+                  <Text>{getInitials(account.full_name)}</Text>
+                </View>
 
                 {/* Name and Time */}
                 <View>
                   <Text className="text-base font-semibold text-gray-900">
-                    {account.name}
+                    {account.full_name}
                   </Text>
-                  <Text className="text-sm text-gray-500">{account.time}</Text>
+                  <Text className="text-sm text-gray-500">
+                    {account.updated_at}
+                  </Text>
                 </View>
               </View>
 
@@ -122,7 +74,7 @@ const AccountsScreen = () => {
                   <View className="absolute w-full h-0.5 bg-gray-400 transform -rotate-45 top-2.5" />
                 </View>
               </TouchableOpacity>
-            </View>
+            </TouchableOpacity>
           ))
         ) : (
           <View className="items-center justify-center py-20">

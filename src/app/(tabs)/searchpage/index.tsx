@@ -11,7 +11,7 @@ import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-nativ
 const SearchPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTab, setSelectedTab] = useState("Discover");
-
+  
 
   // Category tabs
   const tabs = ["Discover", "Accounts", "Category"];
@@ -72,7 +72,9 @@ const SearchPage = () => {
       <View>
         <View>
           {selectedTab === "Discover" && <DiscoverScreen />}
-          {selectedTab === "Accounts" && <AccountsScreen />}
+          {selectedTab === "Accounts" && (
+            <AccountsScreen searchQuery={searchQuery} />
+          )}
           {selectedTab === "Category" && <CategoryScreen />}
           {selectedTab === "Filter" && <ApplyFilter />}
 

@@ -69,6 +69,13 @@ const currentUserId = getUserData.data?.data?.id;
       params: { item: JSON.stringify(productDetails) },
     });
   };
+
+  const handleViewUserProfile=(item:any)=>{
+    router.push({
+      pathname: `/homepage/view-user-profile`,
+      params: { item: JSON.stringify(item) },
+    });
+  }
   return (
     <Screen className="bg-white" scroll={true}>
       {/* Top Navigation Bar */}
@@ -253,20 +260,10 @@ const currentUserId = getUserData.data?.data?.id;
               className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-4"
             >
               {/* Post Header */}
-              <View className="flex-row items-center p-4">
-                {/* <View className="w-10 h-10 rounded-full mr-3">
-                  <Image
-                    source={{
-                      uri: item.images[0],
-                    }}
-                    style={{
-                      height: "100%",
-                      width: "100%",
-                      borderRadius: 100,
-                    }}
-                    contentFit="cover"
-                  />
-                </View> */}
+              <TouchableOpacity className="flex-row items-center p-4" onPress={()=>{
+                handleViewUserProfile(item)
+              }}>
+               
                 <View className=" items-center justify-center w-10 h-10 rounded-full bg-slate-200 mr-2">
                   <Text>{getInitials(item.seller?.full_name)}</Text>
                 </View>
@@ -279,7 +276,7 @@ const currentUserId = getUserData.data?.data?.id;
                     {item.name}
                   </Text>
                 </View>
-              </View>
+              </TouchableOpacity>
 
               {/* Post Description */}
               <View className="px-4 pb-3">

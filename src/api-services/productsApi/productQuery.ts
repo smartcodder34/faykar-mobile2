@@ -18,7 +18,7 @@ export const useProductCategories = () => {
 
 export const useSubProductCategories = (categoryId: any) => {
   return useQuery({
-    queryKey: ["get-sub-category"],
+    queryKey: ["get-sub-category", categoryId],
     queryFn: () => subProductCategories(categoryId),
     enabled: !!categoryId, // Only run this query if categoryId is provided
   });

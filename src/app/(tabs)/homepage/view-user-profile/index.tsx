@@ -1,23 +1,33 @@
-import { useGetUserApi } from "@/src/api-services/authApi/authQuery";
-import { useGetUserProducts } from "@/src/api-services/productsApi/productQuery";
+import {
+    useFollowUserMutation,
+    useUnFollowUserMutation,
+} from "@/src/api-services/followApi/followerMutation";
 import EmptyState from "@/src/components/EmptyState";
-import PostsGrid from "@/src/components/profileScreen/PostsGrid";
-import CustomButton from "@/src/CustomComps/CustomButton";
 import Screen from "@/src/layout/Screen";
 import { rS, rV } from "@/src/lib/responsivehandler";
 import { getInitials } from "@/src/utils/getInitials";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import React from "react";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import React, { useMemo } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
-const ProfilePage = () => {
+const ViewUserProfile = () => {
   const router = useRouter();
-  const getUserData = useGetUserApi();
-  const getUserProducts = useGetUserProducts();
-  const userProducts = getUserProducts?.data?.data?.products || [];
+  const params = useLocalSearchParams();
+  const followUserMutation = useFollowUserMutation();
+  const unfollowUserMutation = useUnFollowUserMutation();
 
-  console.log("userProducts2000:", userProducts);
+  const newData = useMemo(() => {
+    return params.item ? JSON.parse(params.item as string) : null;
+  }, [params.item]);
+
+  console.log("newData", newData);
+
+  const handleFollower = (userId: string) => {
+    console.log(userId);
+    followUserMutation.mutate(userId);
+  };
+ 
 
   return (
     <Screen className="">
@@ -31,7 +41,7 @@ const ProfilePage = () => {
             className="font-[InterSemiBold] text-primary"
             style={{ fontSize: rS(18) }}
           >
-            My Profile
+            View Profile
           </Text>
         </View>
         <TouchableOpacity
@@ -51,7 +61,7 @@ const ProfilePage = () => {
             style={{ width: rV(70), height: rV(70) }}
           >
             <Text className=" font-[PoppinsSemiBold] text-3xl">
-              {getInitials(getUserData?.data?.data?.full_name)}
+              {getInitials(newData?.seller?.full_name)}
             </Text>
           </View>
 
@@ -60,18 +70,23 @@ const ProfilePage = () => {
               className="text-primary font-[PoppinsBold]"
               style={{ fontSize: rS(16) }}
             >
-              {getUserData?.data?.data?.full_name}
+              {newData?.seller?.full_name}
             </Text>
             <Text
               className="font-[PoppinsSemiBold] text-gray-600"
               style={{ fontSize: rS(12) }}
             >
-              {getUserData?.data?.data?.email}
+              {newData?.seller.email}
             </Text>
           </View>
-          {/* <TouchableOpacity className=" h-10  bg-primary items-center justify-center rounded-full">
+          <TouchableOpacity
+            className=" h-10  bg-primary items-center justify-center rounded-full"
+            onPress={() => {
+              handleFollower(newData?.seller?.id);
+            }}
+          >
             <Text className="text-white px-4">Follow</Text>
-          </TouchableOpacity> */}
+          </TouchableOpacity>
         </View>
 
         {/* Bio */}
@@ -87,7 +102,7 @@ const ProfilePage = () => {
         </View>
 
         {/* Edit Profile Button */}
-        <View className="mb-4">
+        {/* <View className="mb-4">
           <CustomButton
             primary
             title="Edit Profile"
@@ -95,7 +110,7 @@ const ProfilePage = () => {
               router.push("/profilepage/edit-profile");
             }}
           />
-        </View>
+        </View> */}
 
         {/* Stats Section */}
         <View className="flex-row justify-around py-4 border-t border-gray-200">
@@ -104,7 +119,7 @@ const ProfilePage = () => {
               className="font-[PoppinsBold] text-black"
               style={{ fontSize: rS(18) }}
             >
-              87
+              0
             </Text>
             <Text
               className="font-[PoppinsMedium] text-gray-600"
@@ -119,7 +134,7 @@ const ProfilePage = () => {
               className="font-[PoppinsBold] text-black"
               style={{ fontSize: rS(18) }}
             >
-              {getUserData?.data?.data?.following_count}
+              {newData?.seller.following_count}
             </Text>
             <Text
               className="font-[PoppinsMedium] text-gray-600"
@@ -134,7 +149,7 @@ const ProfilePage = () => {
               className="font-[PoppinsBold] text-black"
               style={{ fontSize: rS(18) }}
             >
-              {getUserData?.data?.data?.follower_count}
+              {newData?.seller.follower_count}
             </Text>
             <Text
               className="font-[PoppinsMedium] text-gray-600"
@@ -157,15 +172,16 @@ const ProfilePage = () => {
       </View>
 
       {/* Posts Grid */}
-      <View className="flex-1 bg-white px-4">
+      <EmptyState />
+      {/* <View className="flex-1 bg-white px-4">
         {userProducts.length === 0 ? (
           <EmptyState />
         ) : (
           <PostsGrid userProducts={userProducts} />
         )}
-      </View>
+      </View> */}
     </Screen>
   );
 };
 
-export default ProfilePage;
+export default ViewUserProfile;
