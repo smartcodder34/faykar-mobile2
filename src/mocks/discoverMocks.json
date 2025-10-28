@@ -1,0 +1,85 @@
+{
+  "success": true,
+  "data": {
+    "products": [
+      {
+        "id": "01k658v20mkkhejz1b55amt243",
+        "name": "school icon",
+        "description": "porduct description",
+        "images": [
+          [
+            "https://res.cloudinary.com/dux2zuc5n/image/upload/v1758966032/product/fmhrcehy4vg3wh8rlwog.png",
+            "https://res.cloudinary.com/dux2zuc5n/image/upload/v1758966036/product/lq7dp3uivof0df4s2gd9.png",
+            "https://res.cloudinary.com/dux2zuc5n/image/upload/v1758966039/product/tgtipnzjbuo1tmu3j8r1.png",
+            "https://res.cloudinary.com/dux2zuc5n/image/upload/v1758966043/product/b3dwmdhwmdnbjnnjlbwh.jpg"
+          ]
+        ],
+        "amount": "5,000.00",
+        "seller": {
+          "id": "01k658j32n7myhs49sra3dg44c",
+          "full_name": "Ayansola Olawuyi",
+          "email": "codedev85+1@gmail.com",
+          "is_account_verified": "unverified",
+          "bio": null,
+          "gender": null,
+          "region": null,
+          "status": "active",
+          "follower_count": 0,
+          "following_count": 1,
+          "created_at": "Sat Sep 2025",
+          "updated_at": "Fri Oct 2025"
+        },
+        "location": "Powell St, San Francisco, CA, United States",
+        "is_active": 1,
+        "product_like": 1,
+        "product_review_count": null,
+        "product_avg_rating": null,
+        "comments_count": 0,
+        "distance_km": "0km",
+        "created_at": "Sat Sep 2025",
+        "updated_at": "Sat Sep 2025"
+      },
+      {
+        "id": "01k7vt7sbwf1en47fdtj3kedwq",
+        "name": "school icon",
+        "description": "porduct description",
+        "images": [
+          [
+            "https://res.cloudinary.com/dux2zuc5n/image/upload/v1760796195/product/bpy0sauwmph05dzcwwr6.png"
+          ]
+        ],
+        "amount": "5,000.00",
+        "seller": {
+          "id": "01k658j32n7myhs49sra3dg44c",
+          "full_name": "Ayansola Olawuyi",
+          "email": "codedev85+1@gmail.com",
+          "is_account_verified": "unverified",
+          "bio": null,
+          "gender": null,
+          "region": null,
+          "status": "active",
+          "follower_count": 0,
+          "following_count": 1,
+          "created_at": "Sat Sep 2025",
+          "updated_at": "Fri Oct 2025"
+        },
+        "location": "Powell St, San Francisco, CA, United States",
+        "is_active": 1,
+        "product_like": 0,
+        "product_review_count": null,
+        "product_avg_rating": null,
+        "comments_count": 0,
+        "distance_km": "0km",
+        "created_at": "Sat Oct 2025",
+        "updated_at": "Sat Oct 2025"
+      }
+    ],
+    "meta": {
+      "current_page": 1,
+      "per_page": 50,
+      "total": 2,
+      "last_page": 1
+    }
+  },
+  "message": "Products fetched successfully"
+}

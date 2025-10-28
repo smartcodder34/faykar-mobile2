@@ -1,0 +1,28 @@
+{
+  "success": true,
+  "data": {
+    "users": [
+      {
+        "id": "01k658j32n7myhs49sra3dg44c",
+        "full_name": "Ayansola Olawuyi",
+        "email": "codedev85+1@gmail.com",
+        "is_account_verified": "unverified",
+        "bio": null,
+        "gender": null,
+        "region": null,
+        "status": "active",
+        "follower_count": 0,
+        "following_count": 1,
+        "created_at": "Sat Sep 2025",
+        "updated_at": "Fri Oct 2025"
+      }
+    ],
+    "meta": {
+      "current_page": 1,
+      "per_page": 50,
+      "total": 1,
+      "last_page": 1
+    }
+  },
+  "message": "Products fetched successfully"
+}

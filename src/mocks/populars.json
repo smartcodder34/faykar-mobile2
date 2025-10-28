@@ -1,0 +1,15 @@
+{
+  "success": true,
+  "data": [
+    {
+      "category_id": "01K658GBGQJP40AJB8257P3993",
+      "term": "fashion",
+      "total_searches": 1,
+      "category": {
+        "id": "01K658GBGQJP40AJB8257P3993",
+        "name": "Fashion"
+      }
+    }
+  ],
+  "message": "Popular search fetched successfully"
+}
