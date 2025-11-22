@@ -1,6 +1,6 @@
 import {
-    useGetProductComments,
-    useViewProduct,
+  useGetProductComments,
+  useViewProduct,
 } from "@/src/api-services/productsApi/productQuery";
 import CommentSection from "@/src/components/homeScreen/CommentSection";
 import Screen from "@/src/layout/Screen";
@@ -158,7 +158,9 @@ const CommentsScreen = () => {
           getProductCommentLists={getProductCommentLists}
           // getUserProduct={getUserProduct}
         />
+
       </View> */}
+     
 
       <View className="flex-1 bg-white rounded-lg overflow-hidden mb-4">
         <CommentSection

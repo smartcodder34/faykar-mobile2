@@ -35,17 +35,17 @@
 
 //   const [messages, setMessages] = useState<Message[]>([]);
 
-//   const {
-//     control,
-//     handleSubmit,
-//     reset,
-//     formState: { errors, isValid },
-//   } = useForm({
-//     mode: "onChange",
-//     defaultValues: {
-//       text: "",
-//     },
-//   });
+  // const {
+  //   control,
+  //   handleSubmit,
+  //   reset,
+  //   formState: { errors, isValid },
+  // } = useForm({
+  //   mode: "onChange",
+  //   defaultValues: {
+  //     text: "",
+  //   },
+  // });
 //   const currentUserId = getUserData.data?.data?.id;
 //   const newData = useMemo(() => {
 //     return params.item
@@ -136,9 +136,9 @@
 //         </View>
 //       </View>
 
-//       {/* Chat Messages */}
+// //       {/* Chat Messages */}
 
-//       <View className=" flex-1 justify-between bg-neutral-100 overflow-visible">
+//        <View className=" flex-1 justify-between bg-neutral-100 overflow-visible">
 //         <View className=" flex-1">
 //           <MessagesList messages={messages} currentUserId={currentUserId} />
 //         </View>

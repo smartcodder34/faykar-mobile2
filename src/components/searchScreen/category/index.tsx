@@ -28,6 +28,7 @@ const CategoryScreen = () => {
   const getProductCategories = useProductCategories();
 
   const getDiscoverCategory = useDiscoverCategory(category1Selected);
+  // const discoverCategoryMutation = useDiscoverCategoryMutation();
   const getPopularSearched = usePopularSearched();
 
 
@@ -36,7 +37,7 @@ const CategoryScreen = () => {
 
   console.log("category1Selected", category1Selected);
   console.log(
-    "getDiscoverCategory2000",
+    "getDiscoverCategory55000",
     getDiscoverCategory?.data?.data?.products
   );
 
@@ -56,6 +57,11 @@ const CategoryScreen = () => {
       };
     }
   );
+
+  // const handleSearch = () => {
+  //   // console.log(userId);
+  //   discoverCategoryMutation.mutate(category1Selected);
+  // };
 
   const products = [
     {
@@ -150,15 +156,15 @@ const CategoryScreen = () => {
           </View>
 
           <ScrollView className="flex-1 bg-white">
-            {getProductCategory.length === 0 ? (
+            {getProductCategory?.length === 0 ? (
               <View className="items-center justify-center py-20">
                 <Text className="text-gray-400 text-base">
-                  No {category1Selected?.title} products found
+                  No {category1Selected?.title}  found
                 </Text>
               </View>
             ) : (
               <View
-                className="flex-row px-4 bg-red-400 pt-10"
+                className="flex-row px-4  pt-10"
                 style={{ gap: 16 }}
               >
                 {/* Left Column */}
