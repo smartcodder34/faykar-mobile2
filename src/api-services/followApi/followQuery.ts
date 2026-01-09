@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { followUserApi, unfollowUserApi } from ".";
+import { fetchFollowerApi, followUserApi, unfollowUserApi } from ".";
 
 
 
@@ -21,6 +21,13 @@ export const useUnfollowUserApi = (userId: string) => {
     queryKey: ["unfollow", userId],
     queryFn: () => unfollowUserApi(userId),
     enabled: !!userId, // Only run this query if userId is provided
+  });
+};
+
+export const useFetchFollowerApi = () => {
+  return useQuery({
+    queryKey: ["fetch-follow"],
+    queryFn: fetchFollowerApi,
   });
 };
 

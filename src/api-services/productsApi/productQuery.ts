@@ -1,12 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import {
+  getCustomerProducts,
   getProductComments,
   getProducts,
   getUserProducts,
   likeProduct,
   productCategories,
   subProductCategories,
-  viewProduct,
+  viewProduct
 } from ".";
 
 export const useProductCategories = () => {
@@ -43,6 +44,13 @@ export const useViewProduct = (postId: string) => {
   return useQuery({
     queryKey: ["get-view-product", postId],
     queryFn: () => viewProduct(postId),
+  });
+};
+
+export const useGetCustomerProducts = (userId: string) => {
+  return useQuery({
+    queryKey: ["get-user-products", userId],
+    queryFn: () => getCustomerProducts(userId),
   });
 };
 

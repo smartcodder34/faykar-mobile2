@@ -1,5 +1,8 @@
 import { useGetUserApi } from "@/src/api-services/authApi/authQuery";
-import { useGetUserProducts } from "@/src/api-services/productsApi/productQuery";
+import {
+  useGetCustomerProducts,
+  useGetUserProducts,
+} from "@/src/api-services/productsApi/productQuery";
 import EmptyState from "@/src/components/EmptyState";
 import PostsGrid from "@/src/components/profileScreen/PostsGrid";
 import CustomButton from "@/src/CustomComps/CustomButton";
@@ -7,6 +10,7 @@ import Screen from "@/src/layout/Screen";
 import { rS, rV } from "@/src/lib/responsivehandler";
 import { getInitials } from "@/src/utils/getInitials";
 import { Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
@@ -15,9 +19,17 @@ const ProfilePage = () => {
   const router = useRouter();
   const getUserData = useGetUserApi();
   const getUserProducts = useGetUserProducts();
-  const userProducts = getUserProducts?.data?.data?.products || [];
+  const userId = getUserData.data?.data?.id;
+  const getCustomerListProducts = useGetCustomerProducts(userId);
+  const userProducts = getCustomerListProducts?.data?.data?.products || [];
 
-  console.log("userProducts2000:", userProducts);
+  // console.log("getCustomerListProducts2000:", getCustomerListProducts);
+
+  React.useEffect(() => {
+    if (userId) {
+      getCustomerListProducts.refetch();
+    }
+  }, [userId]);
 
   return (
     <Screen className="">
@@ -46,14 +58,32 @@ const ProfilePage = () => {
       {/* Profile Info Section */}
       <View className="px-4 py-2 bg-white">
         <View className="flex-row items-center mb-4">
-          <View
-            className="rounded-full items-center justify-center bg-slate-200"
-            style={{ width: rV(70), height: rV(70) }}
-          >
-            <Text className=" font-[PoppinsSemiBold] text-3xl">
-              {getInitials(getUserData?.data?.data?.full_name)}
-            </Text>
-          </View>
+          {getUserData?.data?.data?.profile_img ? (
+            <View
+              className="rounded-full items-center justify-center bg-slate-200"
+              style={{ width: rV(70), height: rV(70) }}
+            >
+              <Image
+                source={{ uri: getUserData?.data?.data?.profile_img }}
+                style={{
+                  height: "100%",
+                  width: "100%",
+                  borderRadius: 100,
+                }}
+                contentFit="cover"
+                onError={(error) => console.log("Image error:", error)}
+              />
+            </View>
+          ) : (
+            <View
+              className="rounded-full items-center justify-center bg-slate-200"
+              style={{ width: rV(70), height: rV(70) }}
+            >
+              <Text className=" font-[PoppinsSemiBold] text-3xl">
+                {getInitials(getUserData?.data?.data?.full_name)}
+              </Text>
+            </View>
+          )}
 
           <View className="ml-4 flex-1">
             <Text
@@ -69,9 +99,7 @@ const ProfilePage = () => {
               {getUserData?.data?.data?.email}
             </Text>
           </View>
-          {/* <TouchableOpacity className=" h-10  bg-primary items-center justify-center rounded-full">
-            <Text className="text-white px-4">Follow</Text>
-          </TouchableOpacity> */}
+         
         </View>
 
         {/* Bio */}
@@ -104,7 +132,7 @@ const ProfilePage = () => {
               className="font-[PoppinsBold] text-black"
               style={{ fontSize: rS(18) }}
             >
-              87
+              {getUserData?.data?.data?.post_count}
             </Text>
             <Text
               className="font-[PoppinsMedium] text-gray-600"

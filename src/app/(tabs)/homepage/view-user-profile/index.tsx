@@ -1,8 +1,12 @@
+import { useGetUserApi } from "@/src/api-services/authApi/authQuery";
 import {
-    useFollowUserMutation,
-    useUnFollowUserMutation,
+  useFollowUserMutation,
+  useUnFollowUserMutation,
 } from "@/src/api-services/followApi/followerMutation";
+import { useFetchFollowerApi } from "@/src/api-services/followApi/followQuery";
+import { useGetCustomerProducts } from "@/src/api-services/productsApi/productQuery";
 import EmptyState from "@/src/components/EmptyState";
+import UserPostsGrid from "@/src/components/homeScreen/UserPostsGrid";
 import Screen from "@/src/layout/Screen";
 import { rS, rV } from "@/src/lib/responsivehandler";
 import { getInitials } from "@/src/utils/getInitials";
@@ -14,12 +18,23 @@ import { Text, TouchableOpacity, View } from "react-native";
 const ViewUserProfile = () => {
   const router = useRouter();
   const params = useLocalSearchParams();
+  const getUserData = useGetUserApi();
   const followUserMutation = useFollowUserMutation();
+   const fetchFollowers = useFetchFollowerApi();
   const unfollowUserMutation = useUnFollowUserMutation();
 
   const newData = useMemo(() => {
     return params.item ? JSON.parse(params.item as string) : null;
   }, [params.item]);
+
+  // const userId = getUserData.data?.data?.id;
+  const getCustomerListProducts = useGetCustomerProducts(newData?.seller?.id);
+  const userProducts = getCustomerListProducts?.data?.data?.products || [];
+
+    const getUserFollowers = fetchFollowers?.data?.data?.followings;
+  const getUserAlreadyFollowed = getUserFollowers?.some(
+    (follower: any) => follower.id === newData?.seller?.id
+  );
 
   console.log("newData", newData);
 
@@ -27,7 +42,6 @@ const ViewUserProfile = () => {
     console.log(userId);
     followUserMutation.mutate(userId);
   };
- 
 
   return (
     <Screen className="">
@@ -79,14 +93,25 @@ const ViewUserProfile = () => {
               {newData?.seller.email}
             </Text>
           </View>
-          <TouchableOpacity
-            className=" h-10  bg-primary items-center justify-center rounded-full"
-            onPress={() => {
-              handleFollower(newData?.seller?.id);
-            }}
-          >
-            <Text className="text-white px-4">Follow</Text>
-          </TouchableOpacity>
+          {getUserAlreadyFollowed ? (
+            <TouchableOpacity
+              className=" h-10  bg-primary items-center justify-center rounded-full"
+              onPress={() => {
+                unfollowUserMutation.mutate(newData?.seller?.id);
+              }}
+            >
+              <Text className="text-white px-4">Unfollow</Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              className=" h-10  bg-primary items-center justify-center rounded-full"
+              onPress={() => {
+                handleFollower(newData?.seller?.id);
+              }}
+            >
+              <Text className="text-white px-4">Follow</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* Bio */}
@@ -119,13 +144,13 @@ const ViewUserProfile = () => {
               className="font-[PoppinsBold] text-black"
               style={{ fontSize: rS(18) }}
             >
-              0
+              {newData?.seller?.post_count}
             </Text>
             <Text
               className="font-[PoppinsMedium] text-gray-600"
               style={{ fontSize: rS(12) }}
             >
-              Posts
+              Post
             </Text>
           </View>
 
@@ -172,14 +197,13 @@ const ViewUserProfile = () => {
       </View>
 
       {/* Posts Grid */}
-      <EmptyState />
-      {/* <View className="flex-1 bg-white px-4">
+      <View className="flex-1 bg-white px-4">
         {userProducts.length === 0 ? (
           <EmptyState />
         ) : (
-          <PostsGrid userProducts={userProducts} />
+          <UserPostsGrid userProducts={userProducts} />
         )}
-      </View> */}
+      </View>
     </Screen>
   );
 };

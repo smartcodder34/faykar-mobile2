@@ -1,7 +1,9 @@
 // Import axios and AsyncStorage
+import useAuthStore from "@/src/store/authStore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios, {
   AxiosInstance,
+  AxiosResponse,
   InternalAxiosRequestConfig
 } from "axios";
 // import useAuthStore from "@/src/stores/authStore";
@@ -46,22 +48,22 @@ axiosInstance.interceptors.request.use(
   }
 );
 
-// Response interceptor for handling 401 Unauthorized errors
-// axiosInstance.interceptors.response.use(
-//   (response: AxiosResponse) => response,
-//   async (error: any) => {
-//     if (error.response?.status === 401) {
-//       try {
-//         // Clear token from storage
-//         await AsyncStorage.removeItem("token");
-//         // Logout user from store
-//         useAuthStore.getState().clearAuthState();
-//       } catch (error) {
-//         console.error("Error in response interceptor:", error);
-//       }
-//     }
-//     return Promise.reject(error);
-//   }
-// );
+//Response interceptor for handling 401 Unauthorized errors
+axiosInstance.interceptors.response.use(
+  (response: AxiosResponse) => response,
+  async (error: any) => {
+    if (error.response?.status === 401) {
+      try {
+        // Clear token from storage
+        await AsyncStorage.removeItem("token");
+        // Logout user from store
+        useAuthStore.getState().clearAuthState();
+      } catch (error) {
+        console.error("Error in response interceptor:", error);
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default axiosInstance;

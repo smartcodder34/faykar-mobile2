@@ -118,6 +118,7 @@ const LoginScreen = () => {
         <Text className="font-[PlusJakartaSansRegular] text-sm text-[#8E8E93]">
           Please login with registered account
         </Text>
+    
 
         <View className="mt-5">
           <View className="mt-5">

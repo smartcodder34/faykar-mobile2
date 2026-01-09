@@ -19,3 +19,13 @@ export const unfollowUserApi = async (userId: any) => {
     throw error;
   }
 };
+
+export const fetchFollowerApi = async () => {
+  try {
+    const res = await axiosInstance.get(`/fetch-followers`);
+    return res.data;
+  } catch (error) {
+    console.error("fetchFollowerApi", error);
+    throw error;
+  }
+};
