@@ -306,12 +306,14 @@
 
 import { useEditUser } from "@/src/api-services/authApi/authMutation";
 import { useGetUserApi } from "@/src/api-services/authApi/authQuery";
+import { useUploadProfileImg } from "@/src/api-services/uploadProfileImg/profileImgMutation";
 import CustomButton from "@/src/CustomComps/CustomButton";
 import CustomInput from "@/src/CustomComps/CustomInput";
 import CustomSelect from "@/src/CustomComps/CustomSelect";
 import LoadingOverlay from "@/src/CustomComps/LoadingOverlay";
 import Screen from "@/src/layout/Screen";
 import { rS, rV } from "@/src/lib/responsivehandler";
+import { getInitials } from "@/src/utils/getInitials";
 import {
   AntDesign,
   EvilIcons,
@@ -319,6 +321,8 @@ import {
   Ionicons,
 } from "@expo/vector-icons";
 import { Image } from "expo-image";
+import * as ImageManipulator from "expo-image-manipulator";
+import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import React from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -330,17 +334,28 @@ interface Item {
   price?: string;
 }
 
- const dataItem = [
-   { title: "Female", value: "female" },
-   { title: "Male", value: "male" },
-   { title: "Others", value: "others" },
- ];
+const dataItem = [
+  { title: "Female", value: "female" },
+  { title: "Male", value: "male" },
+  { title: "Others", value: "others" },
+];
+
+const resizeImage = async (uri: any) => {
+  const resizedPhoto = await ImageManipulator.manipulateAsync(
+    uri,
+    [{ resize: { width: 200 } }], // resize to width of 300 and preserve aspect ratio
+    { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG } // compress and set format
+  );
+  return resizedPhoto;
+};
 
 const EditProfileScreen = () => {
   const router = useRouter();
   const getUserData = useGetUserApi();
+  const uploadingUserPicture = useUploadProfileImg();
   const [openDropDown, setOpenDropDown] = React.useState(false);
   const [selected, setSelected] = React.useState<Item | null>(null);
+  const [imageSelected, setImageSelected] = React.useState<string | any>(null);
 
   const {
     control,
@@ -360,7 +375,6 @@ const EditProfileScreen = () => {
     },
   });
 
- 
 
   React.useEffect(() => {
     if (getUserData?.data) {
@@ -371,9 +385,7 @@ const EditProfileScreen = () => {
         bio: getUserData?.data?.data?.bio || "",
         region: getUserData?.data?.data?.region || "",
       });
-      const matchingGender = dataItem.find(
-        (item) => item.value === userData
-      );
+      const matchingGender = dataItem.find((item) => item.value === userData);
       setSelected(matchingGender || null);
     }
   }, [getUserData?.data, reset]);
@@ -390,8 +402,47 @@ const EditProfileScreen = () => {
   };
 
   const editUserProfile = useEditUser();
-  console.log("editUserProfile:", editUserProfile);
 
+  const handleImagePick = async () => {
+    try {
+      // No permissions request is necessary for launching the image library
+      await ImagePicker.requestCameraPermissionsAsync();
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+
+      if (!result.canceled) {
+        setImageSelected(result.assets[0].uri);
+        console.log("result.assets", result.assets[0].uri);
+      }
+    } catch (error) {
+      console.log("error form image upload", error);
+    }
+  };
+
+  const handleImgUpload = async () => {
+    if (imageSelected) {
+      const resizedPhoto = await resizeImage(imageSelected);
+      const imageFile = {
+        uri: resizedPhoto.uri,
+        type: "image/jpeg",
+        name: "profile.jpg",
+      };
+      const formData = new FormData();
+      formData.append("profile_img", imageFile as any);
+      console.log("formData entries:", formData);
+      uploadingUserPicture.mutate(formData);
+    }
+  };
+
+  React.useEffect(() => {
+    (async () => {
+      await handleImgUpload();
+    })();
+  }, [imageSelected]);
   return (
     <Screen scroll={true} className="">
       <LoadingOverlay
@@ -423,8 +474,31 @@ const EditProfileScreen = () => {
             className="rounded-full"
             style={{ width: rV(70), height: rV(70) }}
           >
-            <Image
-              source={require("@/assets/images/profile-img.jpg")}
+            {imageSelected ? (
+              <Image
+                // source={require("@/assets/images/profile-img.jpg")}
+                source={{ uri: imageSelected }}
+                style={{
+                  height: "100%",
+                  width: "100%",
+                  borderRadius: 100,
+                }}
+                contentFit="cover"
+                onError={(error) => console.log("Image error:", error)}
+              />
+            ) : (
+              <View
+                className="bg-gray-400 rounded-full items-center justify-center"
+                style={{ width: rV(70), height: rV(70) }}
+              >
+                <Text className=" text-white">
+                  {getInitials(getUserData?.data?.data?.full_name)}
+                </Text>
+              </View>
+            )}
+            {/* <Image
+              // source={require("@/assets/images/profile-img.jpg")}
+              source={{ uri: imageSelected }}
               style={{
                 height: "100%",
                 width: "100%",
@@ -432,7 +506,7 @@ const EditProfileScreen = () => {
               }}
               contentFit="cover"
               onError={(error) => console.log("Image error:", error)}
-            />
+            /> */}
           </View>
 
           <View className="ml-4 flex-1">
@@ -442,7 +516,7 @@ const EditProfileScreen = () => {
             >
               {getUserData?.data?.data?.full_name}
             </Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={handleImagePick}>
               <Text
                 className="font-[PoppinsSemiBold] text-primary"
                 style={{ fontSize: rS(12) }}

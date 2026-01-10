@@ -1,4 +1,7 @@
-import { useRegisterSocialUser, useRegisterUser } from "@/src/api-services/authApi/authMutation";
+import {
+  useRegisterSocialUser,
+  useRegisterUser,
+} from "@/src/api-services/authApi/authMutation";
 import CustomButton from "@/src/CustomComps/CustomButton";
 import CustomInput from "@/src/CustomComps/CustomInput";
 import LoadingOverlay from "@/src/CustomComps/LoadingOverlay";
@@ -16,9 +19,14 @@ import { useRouter } from "expo-router";
 import React from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Text, TouchableOpacity, View } from "react-native";
+import CountryPicker from "react-native-country-picker-modal";
 
 const CreateAccount = () => {
   const router = useRouter();
+  const [form, setForm] = React.useState<{ [key: string]: any }>({
+    cCountryCode: "US",
+    country_Code: "1",
+  });
   const [isSecureEntry, setIsSecureEntry] = React.useState(true);
   const [comPassIsSecureEntry, setComPassIsSecureEntry] = React.useState(true);
 
@@ -26,6 +34,8 @@ const CreateAccount = () => {
 
   const registerUser = useRegisterUser();
   const registerSocialDetails = useRegisterSocialUser();
+
+  console.log("formdata3333", form);
 
   const {
     control,
@@ -47,11 +57,18 @@ const CreateAccount = () => {
 
   const onSubmit = (data: any) => {
     if (data) {
-      registerUser.mutate(data);
-      setUserRegOtps({
+      const requestedPayload = {
         email: data.email.toLowerCase(),
-      });
-      console.log("testing234: ", data);
+        full_name: data.full_name,
+        password: data.password,
+        password_confirmation: data.password_confirmation,
+        phone_number: `+${form.country_Code}${data.phone_number}`,
+      };
+      // registerUser.mutate(data);
+      // setUserRegOtps({
+      //   email: data.email.toLowerCase(),
+      // });
+      console.log("testing500: ", requestedPayload);
     }
   };
 
@@ -68,12 +85,11 @@ const CreateAccount = () => {
           full_name: response.data?.user.name,
           phone_number: "+2348109302800",
           email: response.data?.user.email,
-          provider:"google"
+          provider: "google",
         });
       } else {
         // sign in was cancelled by user
         console.log("sign in was cancelled by user");
-
       }
     } catch (error) {
       if (isErrorWithCode(error)) {
@@ -156,12 +172,12 @@ const CreateAccount = () => {
               rules={{
                 required: "Phone number is required",
                 minLength: {
-                  value: 14,
-                  message: "Phone Number must be 14 digits",
+                  value: 8,
+                  message: "Phone Number must be 8 digits",
                 },
                 maxLength: {
-                  value: 14,
-                  message: "Phone Number must not exceed 14 digits",
+                  value: 12,
+                  message: "Phone Number must not exceed 12 digits",
                 },
               }}
               render={({
@@ -171,20 +187,33 @@ const CreateAccount = () => {
                 <CustomInput
                   label="Phone Number"
                   primary
-                  placeholder="+4456664440"
+                  placeholder="445 666 4440"
                   // keyboardType={"numeric"}
                   value={value}
-                  // onChangeText={onChange}
-                  onChangeText={(text: any) => {
-                    if (text?.length <= 14) {
-                      onChange(text);
-                    }
-                  }}
+                  onChangeText={onChange}
                   error={errors?.phone_number?.message}
                   icon={
-                    <View className="mx-3">
-                      <Feather name="phone" size={24} color="#2E6939" />
-                    </View>
+                    <CountryPicker
+                      //  countryCode
+                      withFilter
+                      withFlag
+                      countryCode={form?.cCountryCode || "US"}
+                      withCountryNameButton={false}
+                      withCallingCodeButton
+                      withCallingCode
+                      withEmoji
+                      onSelect={(v) => {
+                        const cCallingCode = v.callingCode[0];
+                        const cCountryCode = v.cca2;
+                        setForm({
+                          ...form,
+                          country_Code: cCallingCode,
+                          cCountryCode,
+                        });
+
+                        console.log(v, "selected country data");
+                      }}
+                    />
                   }
                   iconPostion="left"
                 />
@@ -229,16 +258,6 @@ const CreateAccount = () => {
               name="password"
               rules={{
                 required: "passowrd is required",
-                minLength: {
-                  value: 8,
-                  message: "Password should be at least 8 characters long",
-                },
-                pattern: {
-                  value:
-                    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&.,]{8,}$/,
-                  message:
-                    "Password must include uppercase, lowercase, and a number.",
-                },
               }}
               render={({ field: { onChange, onBlur, value } }) => (
                 <CustomInput

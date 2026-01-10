@@ -123,8 +123,7 @@ const CreateProduct = () => {
     }
   };
 
-  console.log("uploadData", uploadData);
-  console.log("imageSelected123:", imageSelected);
+
 
   const handleRemoveImage = (index: number) => {
     setUploadData((prev) => {

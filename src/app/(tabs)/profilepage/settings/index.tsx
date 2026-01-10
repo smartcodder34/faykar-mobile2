@@ -128,7 +128,9 @@ const SettingsScreen = () => {
           <Ionicons name="chevron-forward" size={20} color="#666" />
         </View>
       ),
-      onPress: () => {}, // Add navigation for friends
+      // onPress: () => {
+      //   router.push("/profilepage/friends");
+      // }, 
     },
   ];
 

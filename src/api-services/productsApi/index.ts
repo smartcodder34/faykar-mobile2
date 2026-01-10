@@ -79,6 +79,16 @@ export const viewProduct = async (dataId: string) => {
   }
 };
 
+export const getCustomerProducts = async (userId: string) => {
+  try {
+    const res = await axiosInstance.get(`/product/products/${userId}`);
+    return res.data;
+  } catch (error) {
+    console.error("get getCustomerProducts", error);
+    throw error;
+  }
+};
+
 export const getProductComments = async (data: string) => {
   console.log("data22222", data);
   try {

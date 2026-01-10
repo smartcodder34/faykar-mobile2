@@ -1,6 +1,5 @@
 import axiosInstance from "@/src/lib/axiosInstance";
 
-
 export const discoverProduct = async () => {
   try {
     const res = await axiosInstance.get(`/discovers/product`);
@@ -11,7 +10,29 @@ export const discoverProduct = async () => {
   }
 };
 
-export const discoverCategory = async (data:any) => {
+export const discoverFilterCategory = async (data: any) => {
+  console.log(data, "databbb");
+  const payload = {
+    title: data.category?.title || data?.title,
+    categoryId: data.category?.value || data?.value,
+    min: data.minPrice,
+    max: data.maxPrice,
+    lat: data.location.latitude.toString(),
+    long: data.location.longitude.toString(),
+  };
+  console.log("payload300", payload);
+  try {
+    const res = await axiosInstance.get(
+      `/discovers/category?term=${payload?.title}&min_price=${payload.min}&max_price=${payload.max}&latitude=${payload.lat}&longitude=${payload.long}&category_id=${payload?.categoryId}`
+    );
+    return res.data;
+  } catch (error) {
+    console.error("discover catagory", error);
+    throw error;
+  }
+};
+
+export const discoverCategory = async (data: any) => {
   console.log(data, "databbb");
   try {
     const res = await axiosInstance.get(
@@ -23,8 +44,8 @@ export const discoverCategory = async (data:any) => {
     throw error;
   }
 };
-// {{APP_URL}}/discovers/:category?term=electronics&category_id=01K65DFRND96GX518C8DD6G4VW
-export const discoverAccount = async (data:string) => {
+
+export const discoverAccount = async (data: string) => {
   try {
     const res = await axiosInstance.get(
       `/discovers/accounts?account_query=${data}`

@@ -1,13 +1,16 @@
 import { useGetUserApi } from "@/src/api-services/authApi/authQuery";
 import { useLikeProductMutation } from "@/src/api-services/productsApi/productMutation";
 import { useGetProducts } from "@/src/api-services/productsApi/productQuery";
+import { useRecordLocationApi } from "@/src/api-services/recordlocation/recordLocationMutation";
+import { useGetUserStatusStories } from "@/src/api-services/statusStoryApi/statusQuery";
+import HomeHeader from "@/src/components/homeScreen/HomeHeader";
+import StatusModal from "@/src/components/homeScreen/StatusModal";
 import { useLocation } from "@/src/hooks/useLocation";
 import Screen from "@/src/layout/Screen";
 import useGetLocation from "@/src/store/locationStore";
 import { getInitials } from "@/src/utils/getInitials";
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
-import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React from "react";
 import {
@@ -23,18 +26,74 @@ const { width } = Dimensions.get("window");
 
 const Homepage = () => {
   const router = useRouter();
+  const [selectedGroup, setSelectedGroup] = React.useState<any>(null);
+  const [isModalVisible, setIsModalVisible] = React.useState(false);
   const { location, address } = useLocation();
   const getAllProducts = useGetProducts();
-    const getUserData = useGetUserApi();
-  
+  const getUserData = useGetUserApi();
+  const { data: statusResponse, isLoading } = useGetUserStatusStories();
+  console.log("statusResponsehomepage:", statusResponse);
+
+  const handleOpenStatus = (group: any) => {
+    setSelectedGroup(group);
+    setIsModalVisible(true);
+  };
+
+  // Transform API data into grouped stories (all stories per user, sorted newest first)
+  const userStoryGroups = React.useMemo(() => {
+    if (!statusResponse?.data) return [];
+
+    return Object.entries(statusResponse.data)
+      .map(([userId, stories]) => {
+        // Clean up URLs by trimming whitespace
+        const cleanedStories = stories.map((story) => ({
+          ...story,
+          media_path: story.media_path.trim(), // 👈 TRIM WHITESPACE HERE
+        }));
+
+        const sortedStories = [...cleanedStories].sort(
+          (a, b) =>
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+
+        const firstStory = sortedStories[0];
+
+        return {
+          userId,
+          name: firstStory.user.full_name,
+          profileImg: firstStory.user.profile_img,
+          stories: sortedStories.map((s) => ({
+            id: s.id,
+            media_path: s.media_path,
+            created_at: s.created_at,
+          })),
+        };
+      })
+      .filter((group) => group.stories.length > 0);
+  }, [statusResponse]);
+
+  console.log("userStoryGroupshomepage:", userStoryGroups);
+
   const likeProduct = useLikeProductMutation();
+  const recordUserLocation = useRecordLocationApi();
+  const handleRecordLocation = async () => {
+    if (location) {
+      await recordUserLocation.mutateAsync({
+        latitude: location?.coords?.latitude,
+        longitude: location?.coords?.longitude,
+      });
+    }
+  };
+
+  React.useEffect(() => {
+    handleRecordLocation();
+  }, [location]);
 
   const setUserLocation = useGetLocation().setUserLocation;
 
   const allProducts = getAllProducts?.data?.data?.products || [];
 
-const currentUserId = getUserData.data?.data?.id;
- 
+  const currentUserId = getUserData.data?.data?.id;
 
   React.useEffect(() => {
     if (location)
@@ -70,47 +129,18 @@ const currentUserId = getUserData.data?.data?.id;
     });
   };
 
-  const handleViewUserProfile=(item:any)=>{
+  const handleViewUserProfile = (item: any) => {
     router.push({
       pathname: `/homepage/view-user-profile`,
       params: { item: JSON.stringify(item) },
     });
-  }
+  };
   return (
     <Screen className="bg-white" scroll={true}>
       {/* Top Navigation Bar */}
-      <View className="flex-row items-center justify-between px-4 py-3 bg-white">
-        <View className="flex-row items-center">
-          <View className=" w-40 h-10 mr-2">
-            <Image
-              source={require("@/assets/images/logo.png")}
-              style={{
-                height: "100%",
-                width: "100%",
-              }}
-              contentFit="contain"
-              onError={(error) => console.log("Image error:", error)}
-            />
-          </View>
-          {/* <Text className="text-primary font-bold text-lg">FAYKAR</Text> */}
-        </View>
-
-        {/* Action Icons */}
-        <View className="flex-row items-center space-x-3">
-          <TouchableOpacity className="w-8 h-8 items-center justify-center">
-            <Ionicons name="add" size={24} color="#2E6939" />
-          </TouchableOpacity>
-          <TouchableOpacity className="w-8 h-8 items-center justify-center">
-            <Ionicons name="notifications-outline" size={24} color="#2E6939" />
-          </TouchableOpacity>
-          <TouchableOpacity className="w-8 h-8 items-center justify-center">
-            <Ionicons name="paper-plane-outline" size={24} color="#2E6939" />
-          </TouchableOpacity>
-        </View>
-      </View>
-
+     <HomeHeader />
       {/* Promotional Banner */}
-      <View className="mx-4 mb-4">
+      {/* <View className="mx-4 mb-4">
         <View className="relative h-40 rounded-2xl overflow-hidden">
           <Image
             source={{
@@ -136,28 +166,34 @@ const currentUserId = getUserData.data?.data?.id;
           </View>
         </View>
 
-        {/* Carousel Dots */}
+       
         <View className="flex-row justify-center mt-2 space-x-2">
           <View className="w-2 h-2 bg-primary rounded-full" />
           <View className="w-2 h-2 bg-gray-300 rounded-full" />
           <View className="w-2 h-2 bg-gray-300 rounded-full" />
         </View>
-      </View>
+      </View> */}
 
       {/* Share your Product Section */}
       <View className="mx-4 mb-4 flex-row items-center">
         <View className="w-10 h-10 rounded-full mr-3">
-          <Image
-            source={{
-              uri: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=50&h=50&fit=crop&crop=face",
-            }}
-            style={{
-              height: "100%",
-              width: "100%",
-              borderRadius: 100,
-            }}
-            contentFit="cover"
-          />
+          {getUserData?.data?.data?.profile_img ? (
+            <Image
+              source={{ uri: getUserData?.data?.data?.profile_img }}
+              style={{
+                height: "100%",
+                width: "100%",
+                borderRadius: 100,
+              }}
+              contentFit="cover"
+            />
+          ) : (
+            <View className="bg-gray-400 w-10 h-10 rounded-full items-center justify-center">
+              <Text className=" text-white">
+                {getInitials(getUserData?.data?.data?.full_name)}
+              </Text>
+            </View>
+          )}
         </View>
 
         <TouchableOpacity
@@ -181,48 +217,23 @@ const currentUserId = getUserData.data?.data?.id;
         contentContainerStyle={{ paddingHorizontal: 16 }}
       >
         {/* Add Product Card */}
-        <View className="w-16 mr-3 items-center">
-          <TouchableOpacity className="w-14 h-20 bg-white border-2 border-dashed border-gray-300 rounded-xl items-center justify-center mb-2">
+        <TouchableOpacity
+          className="w-16 mr-3 items-center"
+          onPress={() => {
+            router.push("/homepage/create-status");
+          }}
+        >
+          <View className="w-14 h-20 bg-white border-2 border-dashed border-gray-300 rounded-xl items-center justify-center mb-2">
             <Ionicons name="add" size={20} color="#666" />
-          </TouchableOpacity>
-          <Text className="text-xs text-gray-600 font-medium">Abdul</Text>
-        </View>
+          </View>
+          {/* <Text className="text-xs text-gray-600 font-medium">Abdul</Text> */}
+        </TouchableOpacity>
 
-        {/* Product Cards */}
-        {[
-          {
-            name: "Meru",
-            image:
-              "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=80&h=100&fit=crop",
-            profileImage:
-              "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=20&h=20&fit=crop&crop=face",
-          },
-          {
-            name: "Chandra",
-            image:
-              "https://images.unsplash.com/photo-1544025162-d76694265947?w=80&h=100&fit=crop",
-            profileImage:
-              "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=20&h=20&fit=crop&crop=face",
-          },
-          {
-            name: "Namaha",
-            image:
-              "https://images.unsplash.com/photo-1566385101042-1a0aa0c1268c?w=80&h=100&fit=crop",
-            profileImage:
-              "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=20&h=20&fit=crop&crop=face",
-          },
-          {
-            name: "Raam",
-            image:
-              "https://images.unsplash.com/photo-1559181567-c3190ca9959b?w=80&h=100&fit=crop",
-            profileImage:
-              "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=20&h=20&fit=crop&crop=face",
-          },
-        ].map((item, index) => (
-          <View key={index} className="w-16 mr-3 items-center">
+        {/* {userStoryGroups?.map((item, index) => (
+          <TouchableOpacity key={index} className="w-16 mr-3 items-center">
             <View className="w-14 h-20 rounded-xl overflow-hidden mb-2 relative">
               <Image
-                source={{ uri: item.image }}
+                source={{ uri: item.stories[0].media_path }}
                 style={{
                   height: "100%",
                   width: "100%",
@@ -234,7 +245,7 @@ const currentUserId = getUserData.data?.data?.id;
                 style={{ transform: [{ translateX: -10 }] }}
               >
                 <Image
-                  source={{ uri: item.profileImage }}
+                  source={{ uri: item.profileImg }}
                   style={{
                     height: "100%",
                     width: "100%",
@@ -244,10 +255,43 @@ const currentUserId = getUserData.data?.data?.id;
                 />
               </View>
             </View>
-            <Text className="text-xs text-gray-600 font-medium">
+            <Text className="text-xs text-center text-gray-600 font-medium">
               {item.name}
             </Text>
-          </View>
+          </TouchableOpacity>
+        ))} */}
+
+        {/* Status List */}
+        {userStoryGroups?.map((item, index) => (
+          <TouchableOpacity
+            key={index}
+            className="w-16 mr-3 items-center"
+            onPress={() => handleOpenStatus(item)} // 3. Add this trigger
+          >
+            <View className="w-14 h-20 rounded-xl overflow-hidden mb-2 relative border-2 border-primary">
+              <Image
+                source={{ uri: item.stories[0].media_path }}
+                style={{ height: "100%", width: "100%" }}
+                contentFit="cover"
+              />
+              <View
+                className="w-5 h-5 border-2 border-white rounded-full absolute bottom-1 left-1/2"
+                style={{ transform: [{ translateX: -10 }] }}
+              >
+                <Image
+                  source={{ uri: item.profileImg }}
+                  style={{ height: "100%", width: "100%", borderRadius: 100 }}
+                  contentFit="cover"
+                />
+              </View>
+            </View>
+            <Text
+              className="text-xs text-center text-gray-600 font-medium"
+              numberOfLines={1}
+            >
+              {item.name}
+            </Text>
+          </TouchableOpacity>
         ))}
       </ScrollView>
 
@@ -260,10 +304,12 @@ const currentUserId = getUserData.data?.data?.id;
               className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-4"
             >
               {/* Post Header */}
-              <TouchableOpacity className="flex-row items-center p-4" onPress={()=>{
-                handleViewUserProfile(item)
-              }}>
-               
+              <TouchableOpacity
+                className="flex-row items-center p-4"
+                onPress={() => {
+                  handleViewUserProfile(item);
+                }}
+              >
                 <View className=" items-center justify-center w-10 h-10 rounded-full bg-slate-200 mr-2">
                   <Text>{getInitials(item.seller?.full_name)}</Text>
                 </View>
@@ -330,7 +376,10 @@ const currentUserId = getUserData.data?.data?.id;
                   </TouchableOpacity>
                 </View>
 
-                <Text className="text-sm text-gray-500">13.5KM... 54mins</Text>
+                <Text className="text-sm text-gray-500">
+                  {item?.distance_km}..
+                  {/* <Text className="text-sm text-gray-500">54mins</Text> */}
+                </Text>
 
                 {item.seller?.id === currentUserId ? null : (
                   <TouchableOpacity
@@ -361,6 +410,12 @@ const currentUserId = getUserData.data?.data?.id;
           );
         })}
       </View>
+
+      <StatusModal
+        visible={isModalVisible}
+        storyGroup={selectedGroup}
+        onClose={() => setIsModalVisible(false)}
+      />
     </Screen>
   );
 };

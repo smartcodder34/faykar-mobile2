@@ -12,26 +12,25 @@ import { Text, TouchableOpacity, View } from 'react-native';
 const ViewProfileProduct = () => {
   const router = useRouter();
   const params = useLocalSearchParams();
-   const getUserData = useGetUserApi();
+  const getUserData = useGetUserApi();
 
   const newData = useMemo(() => {
     return params.item ? JSON.parse(params.item as string) : null;
   }, [params.item]);
 
-   const viewUserProduct = useViewProduct(newData);
-   
+  const viewUserProduct = useViewProduct(newData);
 
    console.log(viewUserProduct, "viewUserProductBB");
-   React.useEffect(() => {
-     if (newData) {
-       console.log("View Product Data:", viewUserProduct.data);
-       viewUserProduct.refetch();
-     }
-   }, [newData]);
+   console.log(newData, "newData");
+
+  React.useEffect(() => {
+    if (newData) {
+      console.log("View Product Data:", viewUserProduct.data);
+      viewUserProduct.refetch();
+    }
+  }, [newData]);
 
 
-  console.log("newData2000", newData);
-  console.log("viewUserProduct5000", viewUserProduct);
   return (
     <Screen className="">
       <View className="flex-row items-center justify-between p-4 bg-white">
@@ -54,9 +53,28 @@ const ViewProfileProduct = () => {
             className="rounded-full items-center justify-center bg-slate-200"
             style={{ width: rV(70), height: rV(70) }}
           >
-            <Text className=" font-[PoppinsSemiBold] text-3xl">
-              {getInitials(getUserData?.data?.data?.full_name)}
-            </Text>
+            {getUserData?.data?.data?.profile_img ? (
+              <Image
+                // source={require("@/assets/images/profile-img.jpg")}
+                source={{ uri: getUserData?.data?.data?.profile_img }}
+                style={{
+                  height: "100%",
+                  width: "100%",
+                  borderRadius: 100,
+                }}
+                contentFit="cover"
+                onError={(error) => console.log("Image error:", error)}
+              />
+            ) : (
+              <View
+                className="bg-gray-400 rounded-full items-center justify-center"
+                style={{ width: rV(70), height: rV(70) }}
+              >
+                <Text className=" text-white">
+                  {getInitials(getUserData?.data?.data?.full_name)}
+                </Text>
+              </View>
+            )}
           </View>
 
           <View className="ml-4 flex-1">
@@ -150,25 +168,28 @@ const ViewProfileProduct = () => {
               >
                 <Ionicons name="chatbubble-outline" size={20} color="#666" />
               </TouchableOpacity>
+              <Text className="  text-lg">
+                {viewUserProduct.data?.data?.comments_count}
+              </Text>
             </View>
 
             <Text className="text-sm text-gray-500">
               {viewUserProduct.data?.data?.distance_km} ... 54mins Away
             </Text>
 
-            <TouchableOpacity className="bg-primary px-3 py-1 rounded-full flex-row items-center">
+            {/* <TouchableOpacity className="bg-primary px-3 py-1 rounded-full flex-row items-center">
               <Ionicons name="person-outline" size={14} color="white" />
               <Text className="text-white text-xs font-medium ml-1">
                 Direct Message
               </Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
 
           {/* Post Details */}
           <View className="px-4 pb-4">
-            <Text className="text-primary text-sm font-medium mb-1">
+            {/* <Text className="text-primary text-sm font-medium mb-1">
               Category :Beef Meat
-            </Text>
+            </Text> */}
             <View className="flex-row justify-end">
               <Text className="text-lg font-bold text-black">
                 ${viewUserProduct.data?.data?.amount}
