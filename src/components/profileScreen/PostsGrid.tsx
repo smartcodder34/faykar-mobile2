@@ -6,13 +6,13 @@ import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 // Helper function to get the correct image source
 const getImageSource = (item: any) => {
   // If item.image exists (local require), use it
-  if (item.image) {
-    return item.image;
+  if (item?.image) {
+    return item?.image;
   }
 
   // If item.images exists, handle array or single value
   if (item.images) {
-    if (Array.isArray(item.images)) {
+    if (Array.isArray(item?.images)) {
       // Check if first element is also an array
       const firstImage = item.images[0];
       if (Array.isArray(firstImage)) {
@@ -71,7 +71,7 @@ const PostsGrid = ({ userProducts }:any) => {
             />
 
             <Text className=" text-center font-[PoppinsMedium] my-2">
-              {item.name}
+              {item?.name}
             </Text>
           </TouchableOpacity>
         </View>

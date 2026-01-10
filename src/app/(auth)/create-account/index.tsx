@@ -35,7 +35,7 @@ const CreateAccount = () => {
   const registerUser = useRegisterUser();
   const registerSocialDetails = useRegisterSocialUser();
 
-  console.log("formdata3333", form);
+ 
 
   const {
     control,
@@ -118,7 +118,7 @@ const CreateAccount = () => {
   //   }
   // };
 
-  console.log("testing1111: ", registerUser);
+ 
 
   return (
     <Screen scroll={true} className="">
@@ -203,8 +203,8 @@ const CreateAccount = () => {
                       withCallingCode
                       withEmoji
                       onSelect={(v) => {
-                        const cCallingCode = v.callingCode[0];
-                        const cCountryCode = v.cca2;
+                        const cCallingCode = v?.callingCode[0];
+                        const cCountryCode = v?.cca2;
                         setForm({
                           ...form,
                           country_Code: cCallingCode,

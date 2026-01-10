@@ -1,15 +1,14 @@
-import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import { Upload } from "lucide-react-native";
-import React, { useState } from "react";
-import { Alert, Text, TouchableOpacity, View } from "react-native";
-
 import CustomButton from "@/src/CustomComps/CustomButton";
 import { useCreateStatusStoryMutation } from "@/src/api-services/statusStoryApi/statusMutation";
 import StoryUploadImage from "@/src/components/StoryUploadImage";
 import Screen from "@/src/layout/Screen";
 import { rS } from "@/src/lib/responsivehandler";
+import { Ionicons } from "@expo/vector-icons";
 import * as ImageManipulator from "expo-image-manipulator";
+import { useRouter } from "expo-router";
+import { Upload } from "lucide-react-native";
+import React, { useState } from "react";
+import { Alert, Text, TouchableOpacity, View } from "react-native";
 
 const resizeImage = async (uri: any) => {
   const resizedPhoto = await ImageManipulator.manipulateAsync(
@@ -29,31 +28,7 @@ const CreateStatus = () => {
   // MUTATION
   const createStatusStory = useCreateStatusStoryMutation();
 
-  const onSubmit2 = async () => {
-    try {
-      if (!imageFile) {
-        Alert.alert("Missing Image", "Please select an image");
-        return;
-      }
-
-      const formData = new FormData();
-
-      // React Native requires this specific object structure for file uploads
-      const fileToUpload = {
-        uri: imageFile.uri,
-        type: imageFile.mimeType || "image/jpeg", // Fallback to jpeg
-        name: imageFile.fileName || `upload_${Date.now()}.jpg`,
-      };
-
-      // @ts-ignore - FormData append for files in RN
-      formData.append("status_image", resizeImage(fileToUpload));
-
-      createStatusStory.mutate(formData);
-    } catch (error) {
-      console.error("Error submitting form:", error);
-    }
-  };
-
+  
   const onSubmit = async () => {
     try {
       if (!imageFile) {
@@ -68,7 +43,7 @@ const CreateStatus = () => {
       formData.append("status_image", {
         uri: resized.uri,
         type: "image/jpeg",
-        name: imageFile.fileName || `upload_${Date.now()}.jpg`,
+        name: imageFile?.fileName || `upload_${Date.now()}.jpg`,
       } as any);
 
       createStatusStory.mutate(formData);
@@ -80,7 +55,7 @@ const CreateStatus = () => {
 
   return (
     <Screen>
-      {/* Header */}
+      
       <View className="flex-row items-center justify-between p-4 bg-white border-b border-gray-100">
         <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="chevron-back" size={24} color="#2E6939" />
@@ -93,7 +68,7 @@ const CreateStatus = () => {
             Create Your Story
           </Text>
         </View>
-        <View className="w-6" /> {/* Spacer for centering */}
+        <View className="w-6" /> 
       </View>
 
       {/* Main Content */}

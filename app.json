@@ -15,7 +15,8 @@
         "ITSAppUsesNonExemptEncryption": false,
         "NSCameraUsageDescription": "This app uses the camera to allow users to upload photos of their products.",
         "NSLocationWhenInUseUsageDescription": "This app uses your location to help you discover nearby user products.",
-        "NSPhotoLibraryUsageDescription": "This app needs access to your photo library to allow you to upload photos of your products."},
+        "NSPhotoLibraryUsageDescription": "This app needs access to your photo library to allow you to upload photos of your products."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -27,8 +28,14 @@
       "permissions": [
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.FOREGROUND_SERVICE"
-      ]
+      ],
+      "runtimeVersion": {
+        "policy": "appVersion"
+      }
     },
     "web": {
       "bundler": "metro",
@@ -67,6 +74,9 @@
       "eas": {
         "projectId": "65b671e2-0ab1-4e53-88df-6fe6cf10b2f5"
       }
+    },
+    "updates": {
+      "url": "https://u.expo.dev/65b671e2-0ab1-4e53-88df-6fe6cf10b2f5"
     }
   }
 }

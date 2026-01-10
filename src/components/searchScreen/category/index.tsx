@@ -35,11 +35,7 @@ const CategoryScreen = () => {
   const popularData = getPopularSearched?.data?.data;
   const getProductCategory = getDiscoverCategory?.data?.data?.products
 
-  console.log("category1Selected", category1Selected);
-  console.log(
-    "getDiscoverCategory55000",
-    getDiscoverCategory?.data?.data?.products
-  );
+ 
 
 
   useEffect(() => {
@@ -52,8 +48,8 @@ const CategoryScreen = () => {
   const newProductCategory = getProductCategories?.data?.data?.categories.map(
     (v: any) => {
       return {
-        title: v.name,
-        value: v.id,
+        title: v?.name,
+        value: v?.id,
       };
     }
   );
@@ -123,8 +119,8 @@ const CategoryScreen = () => {
       style={{ width: COLUMN_WIDTH }}
     >
       <Image
-        source={{ uri: item.image }}
-        style={{ width: "100%", height: item.height }}
+        source={{ uri: item?.image }}
+        style={{ width: "100%", height: item?.height }}
         resizeMode="cover"
       />
     </TouchableOpacity>
@@ -217,7 +213,7 @@ const CategoryScreen = () => {
             ) : (
               popularData?.map((item: any) => (
                 <TouchableOpacity
-                  key={item.id}
+                  key={item?.id}
                   className="flex-row  my-1 items-center p-3 rounded-2xl bg-primary"
                 >
                   {/* Product Image */}
@@ -229,10 +225,10 @@ const CategoryScreen = () => {
                   {/* Product Info */}
                   <View className="  ">
                     <Text className="text-base font-semibold text-white mb-1">
-                      {item.term}
+                      {item?.term}
                     </Text>
                     <Text className="text-sm text-white ">
-                      total search: {item.total_searches}
+                      total search: {item?.total_searches}
                     </Text>
                   </View>
 

@@ -14,7 +14,7 @@ const getImageSource = (item: any) => {
   if (item.images) {
     if (Array.isArray(item.images)) {
       // Check if first element is also an array
-      const firstImage = item.images[0];
+      const firstImage = item?.images[0];
       if (Array.isArray(firstImage)) {
         return { uri: firstImage[0] };
       }
@@ -71,7 +71,7 @@ const UserPostsGrid = ({ userProducts }:any) => {
             />
 
             <Text className=" text-center font-[PoppinsMedium] my-2">
-              {item.name}
+              {item?.name}
             </Text>
           </TouchableOpacity>
         </View>
