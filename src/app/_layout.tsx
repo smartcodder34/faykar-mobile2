@@ -97,7 +97,6 @@ export default function RootLayout() {
             </Stack>
             <StatusBar style="auto" />
             <Toast config={toastConfig} />
-            <Toast />
           </GestureHandlerRootView>
         </SafeAreaProvider>
       </QueryClientProvider>
