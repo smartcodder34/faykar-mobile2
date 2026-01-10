@@ -4206,10 +4206,10 @@ expo-image-picker@^17.0.8:
   dependencies:
     expo-image-loader "~6.0.0"
 
-expo-image@^3.0.8:
-  version "3.0.8"
-  resolved "https://registry.yarnpkg.com/expo-image/-/expo-image-3.0.8.tgz#ec76f7a300712cc659b197e5478362426e411424"
-  integrity sha512-L83fTHVjvE5hACxUXPk3dpABteI/IypeqxKMeOAAcT2eB/jbqT53ddsYKEvKAP86eoByQ7+TCtw9AOUizEtaTQ==
+expo-image@~2.4.1:
+  version "2.4.1"
+  resolved "https://registry.yarnpkg.com/expo-image/-/expo-image-2.4.1.tgz#c3f84795e33ea98d833fc4dad11ad750ea290b3e"
+  integrity sha512-yHp0Cy4ylOYyLR21CcH6i70DeRyLRPc0yAIPFPn4BT/BpkJNaX5QMXDppcHa58t4WI3Bb8QRJRLuAQaeCtDF8A==
 
 expo-json-utils@~0.15.0:
   version "0.15.0"

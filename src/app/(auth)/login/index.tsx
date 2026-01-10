@@ -17,11 +17,10 @@ import {
   isSuccessResponse,
   statusCodes,
 } from "@react-native-google-signin/google-signin";
-import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import React, { useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Keyboard, Text, TouchableOpacity, View } from "react-native";
+import { Image, Keyboard, Text, TouchableOpacity, View } from "react-native";
 
 const LoginScreen = () => {
   const router = useRouter();
@@ -118,7 +117,6 @@ const LoginScreen = () => {
         <Text className="font-[PlusJakartaSansRegular] text-sm text-[#8E8E93]">
           Please login with registered account
         </Text>
-    
 
         <View className="mt-5">
           <View className="mt-5">
@@ -245,8 +243,7 @@ const LoginScreen = () => {
                 // alignSelf: "center",
                 // borderRadius: 100,
               }}
-              contentFit="contain"
-              onError={(error) => console.log("Image error:", error)}
+              resizeMode="contain"
             />
           </TouchableOpacity>
 
@@ -259,8 +256,7 @@ const LoginScreen = () => {
                 // alignSelf: "center",
                 // borderRadius: 100,
               }}
-              contentFit="contain"
-              onError={(error) => console.log("Image error:", error)}
+              resizeMode="contain"
             />
           </TouchableOpacity>
         </View>
