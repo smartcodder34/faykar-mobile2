@@ -61,16 +61,6 @@ const ResetPasswordSheet = ({ handleForgotPassswordClose }: any) => {
             name="password"
             rules={{
               required: "passowrd is required",
-              minLength: {
-                value: 8,
-                message: "Password should be at least 8 characters long",
-              },
-              pattern: {
-                value:
-                  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&.,]{8,}$/,
-                message:
-                  "Password must include uppercase, lowercase, and a number.",
-              },
             }}
             render={({ field: { onChange, onBlur, value } }) => (
               <CustomInput

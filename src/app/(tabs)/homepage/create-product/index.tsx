@@ -5,8 +5,8 @@ import {
 } from "@/src/api-services/productsApi/productQuery";
 import CustomButton from "@/src/CustomComps/CustomButton";
 import CustomSelect from "@/src/CustomComps/CustomSelect";
-import Screen from "@/src/layout/Screen";
 import { rS, rV } from "@/src/lib/responsivehandler";
+import currencyData from "@/src/mocks/currencies.json";
 import useGetLocation from "@/src/store/locationStore";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import * as ImageManipulator from "expo-image-manipulator";
@@ -31,7 +31,7 @@ const resizeImage = async (uri: any) => {
   const resizedPhoto = await ImageManipulator.manipulateAsync(
     uri,
     [{ resize: { width: 200 } }], // resize to width of 300 and preserve aspect ratio
-    { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG } // compress and set format
+    { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG }, // compress and set format
   );
   return resizedPhoto;
 };
@@ -43,9 +43,7 @@ const CreateProduct = () => {
   // Form state
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
-  const [deliveryAvailable, setDeliveryAvailable] = useState<"1" | "0">(
-    "0"
-  );
+  const [deliveryAvailable, setDeliveryAvailable] = useState<"1" | "0">("0");
 
   const firstTimeRef = React.useRef(true);
   // const [selected, setSelected] = React.useState<any | null>(null);
@@ -56,16 +54,15 @@ const CreateProduct = () => {
   const [currentIndex, setCurrentIndex] = React.useState<number | any>();
 
   // Category states
-  const [category1Open, setCategory1Open] = useState(false);
   const [category1Selected, setCategory1Selected] = useState<Item | null>(null);
-
-  const [category2Open, setCategory2Open] = useState(false);
   const [category2Selected, setCategory2Selected] = useState<Item | null>(null);
+
+  const [selectedCurrency, setSelectedCurrency] = useState<Item | null>(null);
 
   //MUTATION
   const getProductCategories = useProductCategories();
   const getSubProductCategories = useSubProductCategories(
-    category1Selected?.value
+    category1Selected?.value,
   );
   const createListingMutation = useCreateProduct();
 
@@ -80,7 +77,7 @@ const CreateProduct = () => {
         title: v.name,
         value: v.id,
       };
-    }
+    },
   );
 
   const newSubProductCategory =
@@ -93,6 +90,15 @@ const CreateProduct = () => {
 
   // console.log("getProductCategorie200s", newProductCategory);
   // console.log("newSubProductCategory:", newSubProductCategory);
+
+  const newcurrencyData = Object.entries(currencyData || {}).map(
+    ([code, value]: [string, any]) => ({
+      title: `${value.name} (${code})`,
+      value: value.symbol,
+    }),
+  );
+
+  console.log("newcurrencyData:", newcurrencyData);
 
   React.useEffect(() => {
     if (imageSelected) {
@@ -123,8 +129,6 @@ const CreateProduct = () => {
     }
   };
 
-
-
   const handleRemoveImage = (index: number) => {
     setUploadData((prev) => {
       const newData = [...prev];
@@ -149,7 +153,7 @@ const CreateProduct = () => {
               type: "image/jpeg",
               name: "file.jpg",
             };
-          })
+          }),
       );
 
       // Add all resized images to formData
@@ -162,6 +166,7 @@ const CreateProduct = () => {
       formData.append("product_description", data?.description);
       formData.append("category_id", category1Selected?.value as any);
       formData.append("sub_category_id", category2Selected?.value as any);
+      formData.append("currency", selectedCurrency?.value as any);
       formData.append("amount", data?.amount);
       formData.append("is_delivery_available", deliveryAvailable);
       formData.append("latitude", String(userLocation?.user_latitude || ""));
@@ -178,7 +183,7 @@ const CreateProduct = () => {
   };
 
   return (
-    <Screen className="bg-white" scroll={true}>
+    <ScrollView className="bg-white" style={{ flex: 1 }}>
       {/* Header */}
       <View className="flex-row items-center justify-between px-6 py-4">
         <TouchableOpacity onPress={() => router.back()}>
@@ -196,6 +201,7 @@ const CreateProduct = () => {
       <ScrollView
         className="flex-1 px-6 pb-20"
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       >
         {/* Select Image(s) Section */}
         <View className="mb-6">
@@ -264,7 +270,7 @@ const CreateProduct = () => {
             Product Name
           </Text>
           <View
-            className="bg-[#2E693945] rounded-2xl px-4 py-3"
+            className="bg-[#2E693945] rounded-2xl px-4"
             style={{ height: rV(45) }}
           >
             <Controller
@@ -285,6 +291,7 @@ const CreateProduct = () => {
                   // error={error?.amount.message}
                   style={{
                     fontSize: rS(14),
+
                     color: "#2E6939",
                     flex: 1,
                   }}
@@ -343,11 +350,8 @@ const CreateProduct = () => {
             primary
             selected={category1Selected}
             setSelected={setCategory1Selected}
-            openDropDown={category1Open}
-            setOpenDropDown={setCategory1Open}
             placeholder="Choose category"
-            // dataItem={category1Data}
-            dataItem={newProductCategory}
+            dataItem={newProductCategory || []}
           />
         </View>
 
@@ -358,10 +362,8 @@ const CreateProduct = () => {
             primary
             selected={category2Selected}
             setSelected={setCategory2Selected}
-            openDropDown={category2Open}
-            setOpenDropDown={setCategory2Open}
-            placeholder="Choose category"
-            dataItem={newSubProductCategory}
+            placeholder="Choose sub category"
+            dataItem={newSubProductCategory || []}
           />
         </View>
 
@@ -373,7 +375,7 @@ const CreateProduct = () => {
           >
             Is Delivery Available
           </Text>
-          <View className="flex-row space-x-6">
+          <View className="flex-row space-x-6 items-center">
             <TouchableOpacity
               className="flex-row items-center"
               onPress={() => setDeliveryAvailable("1")}
@@ -398,7 +400,7 @@ const CreateProduct = () => {
             </TouchableOpacity>
 
             <TouchableOpacity
-              className="flex-row items-center"
+              className="flex-row items-center mx-3"
               onPress={() => setDeliveryAvailable("0")}
             >
               <View
@@ -422,6 +424,17 @@ const CreateProduct = () => {
           </View>
         </View>
 
+        <View className="mb-6">
+          <CustomSelect
+            label="Select Currency"
+            primary
+            selected={selectedCurrency}
+            setSelected={setSelectedCurrency}
+            placeholder="Choose Select Currency"
+            dataItem={newcurrencyData || []}
+          />
+        </View>
+
         {/* Price Section */}
         <View className="mb-8">
           <Text
@@ -431,7 +444,7 @@ const CreateProduct = () => {
             Price
           </Text>
           <View
-            className="bg-[#2E693945] rounded-2xl px-4 py-3"
+            className="bg-[#2E693945] rounded-2xl px-4 "
             style={{ height: rV(45) }}
           >
             <Controller
@@ -482,7 +495,7 @@ const CreateProduct = () => {
           />
         </View>
       </ScrollView>
-    </Screen>
+    </ScrollView>
   );
 };
 

@@ -21,16 +21,14 @@ const Verification = () => {
 
   console.log("email777", email);
 
-
   console.log("value234:", value);
 
-   const handleVerifyEmail = () => {
-     emailVerification.mutate({
-       email: email,
-       otp: value,
-     });
-   };
-
+  const handleVerifyEmail = () => {
+    emailVerification.mutate({
+      email: email,
+      otp: value,
+    });
+  };
 
   // bottom sheet
   const snapPoints = useMemo(() => ["30%", "50%"], []);
@@ -43,10 +41,9 @@ const Verification = () => {
   const handleVerifyBottomSheetClose = () =>
     verifybottomSheetRef.current?.close();
 
+  const emailVerification = useVerifyEmail(handleVerifyBottomSheetOpen);
 
-    const emailVerification = useVerifyEmail(handleVerifyBottomSheetOpen);
-
-console.log("emailVerification:", emailVerification);
+  console.log("emailVerification:", emailVerification);
   return (
     <Screen className=" ">
       <LoadingOverlay
@@ -61,7 +58,7 @@ console.log("emailVerification:", emailVerification);
             router.back();
           }}
         >
-          <AntDesign name="arrowleft" size={24} color="black" />
+          <AntDesign name="arrow-left" size={24} color="black" />
         </TouchableOpacity>
 
         <View>
