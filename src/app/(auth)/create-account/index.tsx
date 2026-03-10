@@ -35,8 +35,6 @@ const CreateAccount = () => {
   const registerUser = useRegisterUser();
   const registerSocialDetails = useRegisterSocialUser();
 
- 
-
   const {
     control,
     handleSubmit,
@@ -64,10 +62,10 @@ const CreateAccount = () => {
         password_confirmation: data.password_confirmation,
         phone_number: `+${form.country_Code}${data.phone_number}`,
       };
-      // registerUser.mutate(data);
-      // setUserRegOtps({
-      //   email: data.email.toLowerCase(),
-      // });
+      registerUser.mutate(data);
+      setUserRegOtps({
+        email: data.email.toLowerCase(),
+      });
       console.log("testing500: ", requestedPayload);
     }
   };
@@ -117,8 +115,6 @@ const CreateAccount = () => {
   //     console.error(error);
   //   }
   // };
-
- 
 
   return (
     <Screen scroll={true} className="">

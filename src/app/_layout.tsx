@@ -15,7 +15,6 @@ import { setupNetworkStatus } from "../lib/networkManager";
 import toastConfig from "../lib/toastConfig";
 import useAuthStore from "../store/authStore";
 
-
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -65,9 +64,9 @@ export default function RootLayout() {
   useEffect(() => {
     GoogleSignin.configure({
       webClientId:
-        "428400835439-38ckn1snv4703kv29c08qqhlln7atvoj.apps.googleusercontent.com",
+        "827497566582-r4812bh0vjljta8e08ehtfbsodlor49g.apps.googleusercontent.com",
       iosClientId:
-        "428400835439-sdhjn80r74a0da615hrs851ke12mfnsg.apps.googleusercontent.com",
+        "827497566582-qv2446h76r8bh2amojt44gemrtgac9gj.apps.googleusercontent.com",
       profileImageSize: 120,
     });
   }, []);

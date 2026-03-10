@@ -10,7 +10,7 @@ import UserPostsGrid from "@/src/components/homeScreen/UserPostsGrid";
 import Screen from "@/src/layout/Screen";
 import { rS, rV } from "@/src/lib/responsivehandler";
 import { getInitials } from "@/src/utils/getInitials";
-import { Ionicons } from "@expo/vector-icons";
+import { FontAwesome6, Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useMemo } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
@@ -20,7 +20,7 @@ const ViewUserProfile = () => {
   const params = useLocalSearchParams();
   const getUserData = useGetUserApi();
   const followUserMutation = useFollowUserMutation();
-   const fetchFollowers = useFetchFollowerApi();
+  const fetchFollowers = useFetchFollowerApi();
   const unfollowUserMutation = useUnFollowUserMutation();
 
   const newData = useMemo(() => {
@@ -31,9 +31,9 @@ const ViewUserProfile = () => {
   const getCustomerListProducts = useGetCustomerProducts(newData?.seller?.id);
   const userProducts = getCustomerListProducts?.data?.data?.products || [];
 
-    const getUserFollowers = fetchFollowers?.data?.data?.followings;
+  const getUserFollowers = fetchFollowers?.data?.data?.followings;
   const getUserAlreadyFollowed = getUserFollowers?.some(
-    (follower: any) => follower.id === newData?.seller?.id
+    (follower: any) => follower.id === newData?.seller?.id,
   );
 
   console.log("newData", newData);
@@ -41,6 +41,13 @@ const ViewUserProfile = () => {
   const handleFollower = (userId: string) => {
     console.log(userId);
     followUserMutation.mutate(userId);
+  };
+
+  const handleOpenChatRoom = (message: any) => {
+    router.push({
+      pathname: `/(tabs)/homepage/direct-message/chat-room`,
+      params: { item: JSON.stringify(message) },
+    });
   };
 
   return (
@@ -93,25 +100,37 @@ const ViewUserProfile = () => {
               {newData?.seller.email}
             </Text>
           </View>
-          {getUserAlreadyFollowed ? (
+          <View className=" flex-row items-center">
             <TouchableOpacity
-              className=" h-10  bg-primary items-center justify-center rounded-full"
-              onPress={() => {
-                unfollowUserMutation.mutate(newData?.seller?.id);
-              }}
+              className=" mx-2"
+              onPress={() => handleOpenChatRoom(newData)}
             >
-              <Text className="text-white px-4">Unfollow</Text>
+              <FontAwesome6
+                name="message"
+                size={20}
+                className="!text-primary"
+              />
             </TouchableOpacity>
-          ) : (
-            <TouchableOpacity
-              className=" h-10  bg-primary items-center justify-center rounded-full"
-              onPress={() => {
-                handleFollower(newData?.seller?.id);
-              }}
-            >
-              <Text className="text-white px-4">Follow</Text>
-            </TouchableOpacity>
-          )}
+            {getUserAlreadyFollowed ? (
+              <TouchableOpacity
+                className=" h-10  bg-primary items-center justify-center rounded-full"
+                onPress={() => {
+                  unfollowUserMutation.mutate(newData?.seller?.id);
+                }}
+              >
+                <Text className="text-white px-4">Unfollow</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                className=" h-10  bg-primary items-center justify-center rounded-full"
+                onPress={() => {
+                  handleFollower(newData?.seller?.id);
+                }}
+              >
+                <Text className="text-white px-4">Follow</Text>
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
 
         {/* Bio */}

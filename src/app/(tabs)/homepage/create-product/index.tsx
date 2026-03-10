@@ -5,10 +5,12 @@ import {
 } from "@/src/api-services/productsApi/productQuery";
 import CustomButton from "@/src/CustomComps/CustomButton";
 import CustomSelect from "@/src/CustomComps/CustomSelect";
+import Screen from "@/src/layout/Screen";
 import { rS, rV } from "@/src/lib/responsivehandler";
 import currencyData from "@/src/mocks/currencies.json";
 import useGetLocation from "@/src/store/locationStore";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
+import { Audio } from "expo-av";
 import * as ImageManipulator from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
@@ -38,16 +40,20 @@ const resizeImage = async (uri: any) => {
 
 const CreateProduct = () => {
   const router = useRouter();
-  const { control, handleSubmit, formState } = useForm();
+  // const { control, handleSubmit, formState } = useForm();
+  const [voiceMemoUri, setVoiceMemoUri] = useState(null);
+  const [recording, setRecording] = useState<Audio.Recording | null>(null);
+  const [recordedUri, setRecordedUri] = useState<string | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const soundRef = React.useRef<Audio.Sound | null>(null);
+
+  const { control, handleSubmit, formState, setValue, watch } = useForm();
 
   // Form state
-  const [description, setDescription] = useState("");
-  const [price, setPrice] = useState("");
   const [deliveryAvailable, setDeliveryAvailable] = useState<"1" | "0">("0");
 
   const firstTimeRef = React.useRef(true);
   // const [selected, setSelected] = React.useState<any | null>(null);
-
   const [imageSelected, setImageSelected] = React.useState<string | null>(null);
 
   const [uploadData, setUploadData] = React.useState(Array(4).fill(null));
@@ -59,6 +65,46 @@ const CreateProduct = () => {
 
   const [selectedCurrency, setSelectedCurrency] = useState<Item | null>(null);
 
+  // START RECORDING
+  async function startRecording() {
+    try {
+      const permission = await Audio.requestPermissionsAsync();
+      if (permission.status === "granted") {
+        await Audio.setAudioModeAsync({
+          allowsRecordingIOS: true,
+          playsInSilentModeIOS: true,
+        });
+        const { recording } = await Audio.Recording.createAsync(
+          Audio.RecordingOptionsPresets.HIGH_QUALITY,
+        );
+        setRecording(recording);
+      }
+    } catch (err) {
+      console.error("Failed to start recording", err);
+    }
+  }
+
+  // STOP RECORDING
+  async function stopRecording() {
+    setRecording(null);
+    await recording?.stopAndUnloadAsync();
+    const uri = recording?.getURI();
+    setRecordedUri(uri || null);
+  }
+
+  // PLAY RECORDING
+  async function playSound() {
+    if (recordedUri) {
+      setIsPlaying(true);
+      const { sound } = await Audio.Sound.createAsync({ uri: recordedUri });
+      soundRef.current = sound;
+      await sound.playAsync();
+      sound.setOnPlaybackStatusUpdate((status) => {
+        if (status.isLoaded && status.didJustFinish) setIsPlaying(false);
+      });
+    }
+  }
+
   //MUTATION
   const getProductCategories = useProductCategories();
   const getSubProductCategories = useSubProductCategories(
@@ -67,8 +113,6 @@ const CreateProduct = () => {
   const createListingMutation = useCreateProduct();
 
   const userLocation = useGetLocation().userLocation;
-
-  // console.log("userLocation from create product:", userLocation);
 
   //category 1 data from api
   const newProductCategory = getProductCategories?.data?.data?.categories.map(
@@ -88,17 +132,12 @@ const CreateProduct = () => {
       };
     });
 
-  // console.log("getProductCategorie200s", newProductCategory);
-  // console.log("newSubProductCategory:", newSubProductCategory);
-
   const newcurrencyData = Object.entries(currencyData || {}).map(
     ([code, value]: [string, any]) => ({
       title: `${value.name} (${code})`,
       value: value.symbol,
     }),
   );
-
-  console.log("newcurrencyData:", newcurrencyData);
 
   React.useEffect(() => {
     if (imageSelected) {
@@ -183,9 +222,16 @@ const CreateProduct = () => {
   };
 
   return (
-    <ScrollView className="bg-white" style={{ flex: 1 }}>
+    // <ScrollView className="bg-white" style={{ flex: 1 }}>
+    <Screen
+      scroll={true}
+      keyboardAware={true}
+      dismissKeyboardOnTap={true}
+      className="bg-white"
+      contentClassName="px-6" // Move your horizontal padding here
+    >
       {/* Header */}
-      <View className="flex-row items-center justify-between px-6 py-4">
+      <View className="flex-row items-center justify-between  py-4">
         <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="arrow-back" size={24} color="#2E6939" />
         </TouchableOpacity>
@@ -199,7 +245,7 @@ const CreateProduct = () => {
 
       {/* Form Content */}
       <ScrollView
-        className="flex-1 px-6 pb-20"
+        className="flex-1  pb-20"
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
@@ -302,41 +348,118 @@ const CreateProduct = () => {
         </View>
 
         {/* Description Section */}
-        <View className="mb-6">
-          <Text
-            className="mb-3 font-[PoppinsMedium] text-black"
-            style={{ fontSize: rS(14) }}
-          >
-            Description
-          </Text>
+        {/* <View className="mb-6">
+          <View className="flex-row justify-between items-center mb-3">
+            <Text
+              className="font-[PoppinsMedium] text-black"
+              style={{ fontSize: rS(14) }}
+            >
+              Description
+            </Text>
+        
+            <View className="flex-row items-center opacity-50">
+              <Ionicons name="mic-outline" size={14} color="#2E6939" />
+              <Text className="ml-1 text-[10px] font-[PoppinsRegular] text-primary">
+                Supports Keyboard Dictation
+              </Text>
+            </View>
+          </View>
+
           <View
             className="bg-[#2E693945] rounded-2xl p-4"
-            style={{ height: rV(80) }}
+            style={{ height: rV(120) }}
           >
             <Controller
               control={control}
               name="description"
-              rules={{
-                required: "Description is required",
-              }}
-              render={({
-                field: { value, onChange, onBlur },
-                fieldState: { error },
-              }) => (
+              rules={{ required: "Description is required" }}
+              render={({ field: { value, onChange } }) => (
                 <TextInput
-                  placeholder="Enter product description..."
+                  placeholder="Tip: Tap the mic on your keyboard to speak..."
                   placeholderTextColor="#2E6939"
-                  // value={description}
-                  // onChangeText={setDescription}
                   value={value}
                   onChangeText={onChange}
-                  multiline
+                  multiline={true}
                   textAlignVertical="top"
+              
+                  autoCorrect={true}
+                  spellCheck={true}
+                  keyboardType="default"
+                  returnKeyType="done"
+                  blurOnSubmit={true}
                   style={{
                     fontSize: rS(14),
                     color: "#2E6939",
                     flex: 1,
                   }}
+                />
+              )}
+            />
+          </View>
+        </View> */}
+
+        {/* Description Section */}
+        <View className="mb-6">
+          <View className="flex-row justify-between items-center mb-3">
+            <Text
+              className="font-[PoppinsMedium] text-black"
+              style={{ fontSize: rS(14) }}
+            >
+              Description & Voice Note
+            </Text>
+
+            <View className="flex-row items-center space-x-4">
+              {recordedUri && (
+                <TouchableOpacity
+                  onPress={playSound}
+                  className="flex-row items-center bg-primary/10 px-2 py-1 rounded-full"
+                >
+                  <Ionicons
+                    name={isPlaying ? "pause-circle" : "play-circle"}
+                    size={18}
+                    color="#2E6939"
+                  />
+                  <Text className="ml-1 text-[10px] text-primary">
+                    Play Memo
+                  </Text>
+                </TouchableOpacity>
+              )}
+
+              <TouchableOpacity
+                onPress={recording ? stopRecording : startRecording}
+                className={`flex-row items-center px-2 py-1 rounded-full ${recording ? "bg-red-100" : "bg-primary/10"}`}
+              >
+                <Ionicons
+                  name={recording ? "stop-circle" : "mic-outline"}
+                  size={18}
+                  color={recording ? "red" : "#2E6939"}
+                />
+                <Text
+                  style={{ color: recording ? "red" : "#2E6939" }}
+                  className="ml-1 text-[10px] font-[PoppinsRegular]"
+                >
+                  {recording ? "Stop" : "Record"}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <View
+            className="bg-[#2E693945] rounded-2xl p-4"
+            style={{ height: rV(120) }}
+          >
+            <Controller
+              control={control}
+              name="description"
+              render={({ field: { value, onChange } }) => (
+                <TextInput
+                  placeholder="Describe your product or record a voice note..."
+                  placeholderTextColor="#2E6939"
+                  value={value}
+                  onChangeText={onChange}
+                  multiline
+                  textAlignVertical="top"
+                  style={{ fontSize: rS(14), color: "#2E6939", flex: 1 }}
                 />
               )}
             />
@@ -495,7 +618,7 @@ const CreateProduct = () => {
           />
         </View>
       </ScrollView>
-    </ScrollView>
+    </Screen>
   );
 };
 

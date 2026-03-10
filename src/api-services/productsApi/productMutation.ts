@@ -3,7 +3,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { commentOnProduct, createProduct, likeProduct } from ".";
 
-
 export const useCreateProduct = () => {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -14,9 +13,8 @@ export const useCreateProduct = () => {
       //   message: data.message,
       // });
 
+      queryClient.invalidateQueries({ queryKey: ["get-products"] });
       router.back();
-     
-         queryClient.invalidateQueries({ queryKey: ["get-products"] });
     },
     onError(error: any) {
       handleAxiosError(error);

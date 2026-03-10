@@ -49,7 +49,6 @@ const LoginScreen = () => {
   const userLogin = useLoginUser();
   const loginSocialDetails = useLoginSocialUser();
 
-
   // bottom sheet
   const snapPoints = useMemo(() => ["30%", "50%"], []);
   //open the bottom sheet
@@ -75,10 +74,10 @@ const LoginScreen = () => {
         // setState({ userInfo: response.data });
         console.log("User Info --> ", response.data);
 
-        loginSocialDetails.mutate({
-          email: response.data?.user.email,
-          provider: "google",
-        });
+        // loginSocialDetails.mutate({
+        //   email: response.data?.user.email,
+        //   provider: "google",
+        // });
       } else {
         // sign in was cancelled by user
         console.log("sign in was cancelled by user");
