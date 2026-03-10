@@ -28,10 +28,17 @@ const Homepage = () => {
   const router = useRouter();
   const [selectedGroup, setSelectedGroup] = React.useState<any>(null);
   const [isModalVisible, setIsModalVisible] = React.useState(false);
-  const { location, address } = useLocation();
+  const { location, address, accuracy } = useLocation();
   const getAllProducts = useGetProducts();
   const getUserData = useGetUserApi();
   const { data: statusResponse, isLoading } = useGetUserStatusStories();
+
+  // Debug: Log location accuracy
+  React.useEffect(() => {
+    if (accuracy) {
+      console.log(`Location accuracy: ${accuracy.toFixed(1)}m`);
+    }
+  }, [accuracy]);
 
   const handleOpenStatus = (group: any) => {
     setSelectedGroup(group);

@@ -1,5 +1,9 @@
 import { useGetUserApi } from "@/src/api-services/authApi/authQuery";
-import { useViewProduct } from "@/src/api-services/productsApi/productQuery";
+import {
+  useGetProductComments,
+  useViewProduct,
+} from "@/src/api-services/productsApi/productQuery";
+import CommentSection from "@/src/components/homeScreen/CommentSection";
 import Screen from "@/src/layout/Screen";
 import { rS, rV } from "@/src/lib/responsivehandler";
 import { getInitials } from "@/src/utils/getInitials";
@@ -19,6 +23,8 @@ const ViewProfileProduct = () => {
   }, [params.item]);
 
   const viewUserProduct = useViewProduct(newData);
+  const getProductCommentLists = useGetProductComments(newData);
+  const product = viewUserProduct?.data?.data;
 
   console.log(viewUserProduct, "viewUserProductBB");
   console.log(newData, "newData");
@@ -27,11 +33,105 @@ const ViewProfileProduct = () => {
     if (newData) {
       console.log("View Product Data:", viewUserProduct.data);
       viewUserProduct.refetch();
+      getProductCommentLists.refetch();
     }
   }, [newData]);
 
+  const productHeader = (
+    <View className="p-4">
+      <View className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
+        {/* Post Header */}
+        <View className="flex-row items-center p-4">
+          <View className="w-10 h-10 rounded-full mr-3">
+            <Image
+              source={{
+                uri: Array.isArray(product?.images?.[0])
+                  ? product?.images?.[0]?.[0]
+                  : product?.images?.[0],
+              }}
+              style={{
+                height: "100%",
+                width: "100%",
+                borderRadius: 100,
+              }}
+              contentFit="cover"
+            />
+          </View>
+
+          <View className="flex-1">
+            <Text className="font-bold text-black">
+              {product?.name}
+            </Text>
+          </View>
+        </View>
+
+        {/* Post Description */}
+        <View className="px-4 pb-3">
+          <Text className="text-gray-700 text-sm leading-5">
+            {product?.description}
+          </Text>
+        </View>
+
+        {/* Post Image */}
+        <View style={{ height: 192, width: "100%" }}>
+          <Image
+            source={{
+              uri: Array.isArray(product?.images?.[0])
+                ? product?.images?.[0]?.[0]
+                : product?.images?.[0],
+            }}
+            style={{
+              height: "100%",
+              width: "100%",
+            }}
+            contentFit="cover"
+          />
+        </View>
+
+        {/* Action Bar */}
+        <View className="flex-row items-center justify-between p-4">
+          <View className="flex-row items-center space-x-4">
+            <TouchableOpacity className="flex-row items-center justify-center">
+              {product?.product_like === 0 ? (
+                <FontAwesome name="heart-o" size={24} color="black" />
+              ) : (
+                <FontAwesome name="heart" size={24} color="red" />
+              )}
+              <Text className="mx-2 text-lg">
+                {product?.product_like}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity className="flex-row">
+              <Ionicons name="chatbubble-outline" size={20} color="#666" />
+            </TouchableOpacity>
+            <Text className="text-lg">
+              {product?.comments_count}
+            </Text>
+          </View>
+
+          <Text className="text-sm text-gray-500">
+            {product?.distance_km}
+          </Text>
+        </View>
+
+        {/* Post Details */}
+        <View className="px-4 pb-4">
+          <View className="flex-row justify-end">
+            <Text className="text-lg font-bold text-black">
+              ${product?.amount}
+            </Text>
+          </View>
+        </View>
+      </View>
+      <Text className="mt-4 font-bold text-gray-800 text-lg">
+        Comments
+      </Text>
+    </View>
+  );
+
   return (
-    <Screen className="">
+    <Screen className="" scroll={false}>
       <View className="flex-row items-center justify-between p-4 bg-white">
         <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="chevron-back" size={24} color="#2E6939" />
@@ -54,7 +154,6 @@ const ViewProfileProduct = () => {
           >
             {getUserData?.data?.data?.profile_img ? (
               <Image
-                // source={require("@/assets/images/profile-img.jpg")}
                 source={{ uri: getUserData?.data?.data?.profile_img }}
                 style={{
                   height: "100%",
@@ -93,110 +192,11 @@ const ViewProfileProduct = () => {
         </View>
       </View>
 
-      <View className="mx-4 mb-20">
-        <View className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-4">
-          {/* Post Header */}
-          <View className="flex-row items-center p-4">
-            <View className="w-10 h-10 rounded-full mr-3">
-              <Image
-                source={{
-                  uri: Array.isArray(viewUserProduct.data?.data?.images[0])
-                    ? viewUserProduct.data?.data?.images[0][0]
-                    : viewUserProduct.data?.data?.images[0],
-                }}
-                style={{
-                  height: "100%",
-                  width: "100%",
-                  borderRadius: 100,
-                }}
-                contentFit="cover"
-              />
-            </View>
-
-            <View className="flex-1">
-              <Text className="font-bold text-black">
-                {viewUserProduct.data?.data.name}
-              </Text>
-            </View>
-          </View>
-
-          {/* Post Description */}
-          <View className="px-4 pb-3">
-            <Text className="text-gray-700 text-sm leading-5">
-              {viewUserProduct.data?.data?.description}
-            </Text>
-          </View>
-
-          {/* Post Image */}
-          <View className="w-full h-48">
-            <Image
-              source={{
-                // uri: item.images[0],
-                uri: Array.isArray(viewUserProduct.data?.data?.images[0])
-                  ? viewUserProduct.data?.data?.images[0][0]
-                  : viewUserProduct.data?.data?.images[0],
-              }}
-              style={{
-                height: "100%",
-                width: "100%",
-              }}
-              contentFit="cover"
-            />
-          </View>
-
-          {/* Action Bar */}
-          <View className="flex-row items-center justify-between p-4">
-            <View className="flex-row items-center space-x-4">
-              <TouchableOpacity
-                className="mx-2  flex-row items-center justify-center"
-                // onPress={() => handleLikeProduct(item.id)}
-              >
-                {viewUserProduct.data?.data?.product_like === 0 ? (
-                  <FontAwesome name="heart-o" size={24} color="black" />
-                ) : (
-                  <FontAwesome name="heart" size={24} color="red" />
-                )}{" "}
-                <Text className=" mx-2 text-lg">
-                  {viewUserProduct.data?.data?.product_like}
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                className="mx-2  flex-row"
-                // onPress={() => handleLikeProduct(item.id)}
-              >
-                <Ionicons name="chatbubble-outline" size={20} color="#666" />
-              </TouchableOpacity>
-              <Text className="  text-lg">
-                {viewUserProduct.data?.data?.comments_count}
-              </Text>
-            </View>
-
-            <Text className="text-sm text-gray-500">
-              {viewUserProduct.data?.data?.distance_km}
-            </Text>
-
-            {/* <TouchableOpacity className="bg-primary px-3 py-1 rounded-full flex-row items-center">
-              <Ionicons name="person-outline" size={14} color="white" />
-              <Text className="text-white text-xs font-medium ml-1">
-                Direct Message
-              </Text>
-            </TouchableOpacity> */}
-          </View>
-
-          {/* Post Details */}
-          <View className="px-4 pb-4">
-            {/* <Text className="text-primary text-sm font-medium mb-1">
-              Category :Beef Meat
-            </Text> */}
-            <View className="flex-row justify-end">
-              <Text className="text-lg font-bold text-black">
-                ${viewUserProduct.data?.data?.amount}
-              </Text>
-            </View>
-          </View>
-        </View>
-      </View>
+      <CommentSection
+        getProductCommentLists={getProductCommentLists}
+        getUserProduct={product}
+        ListHeaderComponent={product ? productHeader : null}
+      />
     </Screen>
   );
 };

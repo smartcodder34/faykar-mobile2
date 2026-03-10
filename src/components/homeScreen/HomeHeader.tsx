@@ -3,7 +3,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import React from "react";
-import { TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 
 const HomeHeader = () => {
   const router = useRouter();
@@ -32,14 +32,6 @@ const HomeHeader = () => {
         >
           <Ionicons name="add" size={24} color="#2E6939" />
         </TouchableOpacity>
-        {/* <TouchableOpacity
-          className="w-8 h-8 items-center justify-center"
-          onPress={() => {
-            router.push("/(tabs)/homepage/notifications");
-          }}
-        >
-          <Ionicons name="notifications-outline" size={24} color="#2E6939" />
-        </TouchableOpacity> */}
 
         <TouchableOpacity
           className="w-8 h-8 items-center justify-center"
@@ -52,14 +44,21 @@ const HomeHeader = () => {
               <View
                 style={{
                   position: "absolute",
-                  top: -2,
-                  right: -2,
-                  width: 8,
-                  height: 8,
-                  borderRadius: 4,
-                  backgroundColor: "#EF4444", // red
+                  top: -6,
+                  right: -6,
+                  minWidth: 18,
+                  height: 18,
+                  borderRadius: 9,
+                  backgroundColor: "#EF4444",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  paddingHorizontal: 4,
                 }}
-              />
+              >
+                <Text style={{ color: "white", fontSize: 10, fontWeight: "bold" }}>
+                  {unreadCount > 9 ? "9+" : unreadCount}
+                </Text>
+              </View>
             )}
           </View>
         </TouchableOpacity>

@@ -35,17 +35,17 @@
 
 //   const [messages, setMessages] = useState<Message[]>([]);
 
-  // const {
-  //   control,
-  //   handleSubmit,
-  //   reset,
-  //   formState: { errors, isValid },
-  // } = useForm({
-  //   mode: "onChange",
-  //   defaultValues: {
-  //     text: "",
-  //   },
-  // });
+// const {
+//   control,
+//   handleSubmit,
+//   reset,
+//   formState: { errors, isValid },
+// } = useForm({
+//   mode: "onChange",
+//   defaultValues: {
+//     text: "",
+//   },
+// });
 //   const currentUserId = getUserData.data?.data?.id;
 //   const newData = useMemo(() => {
 //     return params.item
@@ -53,57 +53,57 @@
 //       : { name: "Abdul Quay" };
 //   }, [params.item]);
 
-  // useEffect(() => {
-  //   createRoomIfNotExists();
+// useEffect(() => {
+//   createRoomIfNotExists();
 
-  //   let roomId = getRoomId(currentUserId, newData.seller?.id);
-  //   const docRef = doc(db, "rooms", roomId);
-  //   const messageRef = collection(docRef, "messages");
-  //   const q = query(messageRef, orderBy("createdAt", "asc"));
-  //   let unsub = onSnapshot(q, (snapshot) => {
-  //     let allMessages = snapshot.docs.map((doc) => {
-  //       return doc.data();
-  //     });
-  //     setMessages([...allMessages]);
-  //   });
+//   let roomId = getRoomId(currentUserId, newData.seller?.id);
+//   const docRef = doc(db, "rooms", roomId);
+//   const messageRef = collection(docRef, "messages");
+//   const q = query(messageRef, orderBy("createdAt", "asc"));
+//   let unsub = onSnapshot(q, (snapshot) => {
+//     let allMessages = snapshot.docs.map((doc) => {
+//       return doc.data();
+//     });
+//     setMessages([...allMessages]);
+//   });
 
-  //   return unsub;
-  // }, [currentUserId, newData.seller?.id]);
+//   return unsub;
+// }, [currentUserId, newData.seller?.id]);
 
 //   console.log("Messages:", messages);
 
-  // const createRoomIfNotExists = async () => {
-  //   // Logic to create chat room if it doesn't exist
-  //   let roomId = getRoomId(currentUserId, newData.seller?.id);
-  //   console.log("Room ID:", roomId);
+// const createRoomIfNotExists = async () => {
+//   // Logic to create chat room if it doesn't exist
+//   let roomId = getRoomId(currentUserId, newData.seller?.id);
+//   console.log("Room ID:", roomId);
 
-  //   await setDoc(doc(db, "rooms", roomId), {
-  //     roomId,
-  //     createdAt: Timestamp.fromDate(new Date()),
-  //   });
-  // };
+//   await setDoc(doc(db, "rooms", roomId), {
+//     roomId,
+//     createdAt: Timestamp.fromDate(new Date()),
+//   });
+// };
 
-  // const handleMessages = async (data: any) => {
-  //   try {
-  //     let roomId = getRoomId(currentUserId, newData.seller?.id);
-  //     const docRef = doc(db, "rooms", roomId);
-  //     const messageRef = collection(docRef, "messages");
-  //     await addDoc(messageRef, {
-  //       text: data.text,
-  //       senderId: currentUserId,
-  //       receiverName: newData.seller?.full_name,
-  //       receiverId: newData.seller?.id,
-  //       timestamp: Timestamp.fromDate(new Date()),
-  //       createdAt: Timestamp.fromDate(new Date()),
-  //     });
-  //     // console.log("Message sent with ID: ", newDoc.id);
-  //     // Clear the input after successful send
-  //     reset();
-  //   } catch (error) {
-  //     console.error("Error sending message: ", error);
-  //     Alert.alert("Error", "Failed to send message.");
-  //   }
-  // };
+// const handleMessages = async (data: any) => {
+//   try {
+//     let roomId = getRoomId(currentUserId, newData.seller?.id);
+//     const docRef = doc(db, "rooms", roomId);
+//     const messageRef = collection(docRef, "messages");
+//     await addDoc(messageRef, {
+//       text: data.text,
+//       senderId: currentUserId,
+//       receiverName: newData.seller?.full_name,
+//       receiverId: newData.seller?.id,
+//       timestamp: Timestamp.fromDate(new Date()),
+//       createdAt: Timestamp.fromDate(new Date()),
+//     });
+//     // console.log("Message sent with ID: ", newDoc.id);
+//     // Clear the input after successful send
+//     reset();
+//   } catch (error) {
+//     console.error("Error sending message: ", error);
+//     Alert.alert("Error", "Failed to send message.");
+//   }
+// };
 
 //   return (
 //     <Screen className="bg-white" scroll={true}>
@@ -193,7 +193,18 @@ import {
 } from "firebase/firestore";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Alert, Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  Alert,
+  Platform,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import {
+  KeyboardAvoidingView,
+  KeyboardStickyView,
+} from "react-native-keyboard-controller";
 import { db } from "../../../../../../firebase-config";
 
 interface Message {
@@ -269,7 +280,7 @@ const ChatRoom = () => {
             participants: [currentUserId, newData.seller.id],
             lastUpdated: Timestamp.fromDate(new Date()),
           },
-          { merge: true } // Prevents overwriting existing data
+          { merge: true }, // Prevents overwriting existing data
         );
 
         setIsRoomReady(true);
@@ -290,7 +301,7 @@ const ChatRoom = () => {
           (error) => {
             console.error("Error listening to messages:", error);
             Alert.alert("Error", "Failed to load messages. Please try again.");
-          }
+          },
         );
       } catch (error) {
         console.error("Error setting up chat room:", error);
@@ -350,7 +361,7 @@ const ChatRoom = () => {
             lastMessage: trimmedText,
             lastSenderId: currentUserId,
           },
-          { merge: true }
+          { merge: true },
         );
 
         reset();
@@ -361,7 +372,7 @@ const ChatRoom = () => {
         setIsSending(false);
       }
     },
-    [roomId, currentUserId, newData.seller, isRoomReady, reset]
+    [roomId, currentUserId, newData.seller, isRoomReady, reset],
   );
 
   return (
@@ -395,53 +406,61 @@ const ChatRoom = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Chat Messages */}
-      <View className="flex-1 justify-between bg-neutral-100 overflow-visible">
-        <View className="flex-1">
-          <MessagesList messages={messages} currentUserId={currentUserId} />
-        </View>
-
-        {/* Input Area */}
-        <View className="p-4" style={{ marginBottom: 20 }}>
-          <View className="flex-row justify-between items-center bg-white rounded-2xl px-4 py-2">
-            <Controller
-              control={control}
-              name="text"
-              rules={{
-                required: "Message is required",
-                validate: (value) =>
-                  value.trim().length > 0 || "Message cannot be empty",
-              }}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <TextInput
-                  placeholder="Type message"
-                  className="flex-1 h-10"
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  value={value}
-                  editable={!isSending && isRoomReady}
-                  multiline
-                />
-              )}
-            />
-            <TouchableOpacity
-              onPress={handleSubmit(handleMessages)}
-              disabled={isSending || !isRoomReady}
-            >
-              <Ionicons
-                name="send"
-                size={20}
-                color={isSending || !isRoomReady ? "#cccccc" : "#2E6939"}
-              />
-            </TouchableOpacity>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 100} // tune to your header height
+      >
+        {/* Chat Messages */}
+        <View className="flex-1 justify-between bg-neutral-100 overflow-visible">
+          <View className="flex-1">
+            <MessagesList messages={messages} currentUserId={currentUserId} />
           </View>
-          {errors.text && (
-            <Text className="text-red-500 text-xs mt-1 ml-4">
-              {errors.text.message}
-            </Text>
-          )}
+
+          {/* Input Area */}
+          <KeyboardStickyView offset={{ opened: 0, closed: 0 }}>
+            <View className="p-4" style={{ marginBottom: 20 }}>
+              <View className="flex-row justify-between items-center bg-white rounded-2xl px-4 py-2">
+                <Controller
+                  control={control}
+                  name="text"
+                  rules={{
+                    required: "Message is required",
+                    validate: (value) =>
+                      value.trim().length > 0 || "Message cannot be empty",
+                  }}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <TextInput
+                      placeholder="Type message"
+                      className="flex-1 h-10"
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      value={value}
+                      editable={!isSending && isRoomReady}
+                      multiline
+                    />
+                  )}
+                />
+                <TouchableOpacity
+                  onPress={handleSubmit(handleMessages)}
+                  disabled={isSending || !isRoomReady}
+                >
+                  <Ionicons
+                    name="send"
+                    size={20}
+                    color={isSending || !isRoomReady ? "#cccccc" : "#2E6939"}
+                  />
+                </TouchableOpacity>
+              </View>
+              {errors.text && (
+                <Text className="text-red-500 text-xs mt-1 ml-4">
+                  {errors.text.message}
+                </Text>
+              )}
+            </View>
+          </KeyboardStickyView>
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </Screen>
   );
 };

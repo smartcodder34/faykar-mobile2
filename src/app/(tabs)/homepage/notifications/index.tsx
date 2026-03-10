@@ -1,24 +1,24 @@
 import {
-    useGetNotificationsApi,
-    useMarkNotificationAsReadApi,
+  useGetNotificationsApi,
+  useMarkNotificationAsReadApi,
 } from "@/src/api-services/notificationsApi/notificationQuery";
 import Screen from "@/src/layout/Screen";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    ActivityIndicator,
-    FlatList,
-    RefreshControl,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  FlatList,
+  RefreshControl,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 const NotificationScreen = () => {
   const router = useRouter();
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  
+
   // API Hooks
   const {
     data: notificationsResponse,
@@ -26,6 +26,8 @@ const NotificationScreen = () => {
     error,
     refetch,
   } = useGetNotificationsApi();
+
+  console.log("notificationsResponse", notificationsResponse);
   // This hook triggers automatically when selectedId changes due to "enabled" property
   const markAsRead = useMarkNotificationAsReadApi(selectedId);
 
@@ -76,13 +78,31 @@ const NotificationScreen = () => {
       .slice(0, 2);
   };
 
+  const handleNotificationPress = (item: any) => {
+    // Mark as read
+    setSelectedId(item.id);
+
+    // Get product_id from data field
+    const productId = item?.data?.product_id;
+
+    if (productId) {
+      router.push({
+        pathname: '/(tabs)/homepage/comments',
+        params: { item: JSON.stringify(productId) },
+      });
+    }
+
+    // Refetch to update read status
+    refetch();
+  };
+
   const renderItem = ({ item }: { item: any }) => {
     const isUnread = !item.read_at;
     const actorName = item.message.split(" ")[0] || "Someone";
 
     return (
       <TouchableOpacity
-        onPress={() => setSelectedId(item.id)}
+        onPress={() => handleNotificationPress(item)}
         className={`flex-row items-start p-4 border-b border-gray-50 ${
           isUnread ? "bg-green-50/40" : "bg-white"
         }`}
