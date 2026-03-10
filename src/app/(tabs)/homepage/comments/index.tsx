@@ -160,7 +160,6 @@
 //         />
 
 //       </View> */}
-     
 
 //       <View className="flex-1 bg-white rounded-lg overflow-hidden mb-4">
 //         <CommentSection
@@ -174,7 +173,6 @@
 
 // export default CommentsScreen;
 
-
 import {
   useGetProductComments,
   useViewProduct,
@@ -186,13 +184,7 @@ import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useMemo } from "react";
-import {
-  KeyboardAvoidingView,
-  Platform,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 
 const CommentsScreen = () => {
   const router = useRouter();
@@ -215,12 +207,8 @@ const CommentsScreen = () => {
   }, [productId]);
 
   return (
-    // Set scroll={false} so the CommentSection FlatList can handle scrolling
-    <Screen className="bg-white" scroll={false}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        className="flex-1"
-      >
+    <Screen className="bg-white" scroll={false} keyboardAware={false}>
+      <View className="flex-1">
         {/* Header */}
         <View className="flex-row items-center justify-between p-4 border-b border-gray-100">
           <TouchableOpacity onPress={() => router.back()}>
@@ -238,9 +226,8 @@ const CommentsScreen = () => {
         <CommentSection
           getProductCommentLists={getProductCommentLists}
           getUserProduct={product}
-          // Header component for the FlatList so the product details scroll with comments
           ListHeaderComponent={
-            product && (
+            product ? (
               <View className="p-4">
                 <View className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
                   <View className="flex-row items-center p-3">
@@ -270,7 +257,6 @@ const CommentsScreen = () => {
                         ? product.images[0][0]
                         : product.images[0],
                     }}
-                    // className="w-full h-48"
                     style={{
                       height: 192,
                       width: "100%",
@@ -305,10 +291,10 @@ const CommentsScreen = () => {
                   Recent Comments
                 </Text>
               </View>
-            )
+            ) : null
           }
         />
-      </KeyboardAvoidingView>
+      </View>
     </Screen>
   );
 };

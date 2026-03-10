@@ -108,7 +108,6 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
-  TouchableWithoutFeedback,
   View,
 } from "react-native";
 import type { Edge } from "react-native-safe-area-context";
@@ -147,8 +146,6 @@ const OptimizedScrollView = memo(
       contentContainerStyle={contentContainerStyle}
       contentContainerClassName={contentContainerClassName}
       removeClippedSubviews={true}
-      // These props are part of VirtualizedListsMixin for FlatList optimization
-      // Using type assertion since they're not in ScrollViewTypes but work at runtime
       {...{
         initialNumToRender: 10,
         maxToRenderPerBatch: 10,
@@ -213,33 +210,37 @@ export default function Screen({
     return <View className={`flex-1 ${contentClassName}`}>{children}</View>;
   };
 
-  const content = keyboardAware ? (
-    <KeyboardAvoidingView
-      style={styles.flex}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-      keyboardVerticalOffset={keyboardOffset}
-    >
-      {renderContent()}
-    </KeyboardAvoidingView>
-  ) : (
-    renderContent()
-  );
+  const renderWithKeyboardHandling = () => {
+    if (!keyboardAware) {
+      return renderContent();
+    }
+
+    return (
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        keyboardVerticalOffset={keyboardOffset}
+      >
+        {renderContent()}
+      </KeyboardAvoidingView>
+    );
+  };
+
+  const content = renderWithKeyboardHandling();
+
+  if (!dismissKeyboardOnTap || !keyboardAware) {
+    return (
+      <SafeScreen edges={edges} className={containerClasses}>
+        {content}
+      </SafeScreen>
+    );
+  }
 
   return (
     <SafeScreen edges={edges} className={containerClasses}>
-      {dismissKeyboardOnTap ? (
-        <TouchableWithoutFeedback
-          onPress={Keyboard.dismiss}
-          accessible={false}
-          style={styles.flex}
-        >
-          <View style={styles.flex} pointerEvents="box-none">
-            {content}
-          </View>
-        </TouchableWithoutFeedback>
-      ) : (
-        content
-      )}
+      <View style={styles.flex}>
+        {content}
+      </View>
     </SafeScreen>
   );
 }

@@ -1,13 +1,13 @@
-import { useGetUserApi } from '@/src/api-services/authApi/authQuery';
-import { useViewProduct } from '@/src/api-services/productsApi/productQuery';
-import Screen from '@/src/layout/Screen';
-import { rS, rV } from '@/src/lib/responsivehandler';
-import { getInitials } from '@/src/utils/getInitials';
-import { FontAwesome, Ionicons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useMemo } from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { useGetUserApi } from "@/src/api-services/authApi/authQuery";
+import { useViewProduct } from "@/src/api-services/productsApi/productQuery";
+import Screen from "@/src/layout/Screen";
+import { rS, rV } from "@/src/lib/responsivehandler";
+import { getInitials } from "@/src/utils/getInitials";
+import { FontAwesome, Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import React, { useMemo } from "react";
+import { Text, TouchableOpacity, View } from "react-native";
 
 const ViewProfileProduct = () => {
   const router = useRouter();
@@ -20,8 +20,8 @@ const ViewProfileProduct = () => {
 
   const viewUserProduct = useViewProduct(newData);
 
-   console.log(viewUserProduct, "viewUserProductBB");
-   console.log(newData, "newData");
+  console.log(viewUserProduct, "viewUserProductBB");
+  console.log(newData, "newData");
 
   React.useEffect(() => {
     if (newData) {
@@ -29,7 +29,6 @@ const ViewProfileProduct = () => {
       viewUserProduct.refetch();
     }
   }, [newData]);
-
 
   return (
     <Screen className="">
@@ -174,7 +173,7 @@ const ViewProfileProduct = () => {
             </View>
 
             <Text className="text-sm text-gray-500">
-              {viewUserProduct.data?.data?.distance_km} ... 54mins Away
+              {viewUserProduct.data?.data?.distance_km}
             </Text>
 
             {/* <TouchableOpacity className="bg-primary px-3 py-1 rounded-full flex-row items-center">
@@ -200,6 +199,6 @@ const ViewProfileProduct = () => {
       </View>
     </Screen>
   );
-}
+};
 
-export default ViewProfileProduct
+export default ViewProfileProduct;
