@@ -13,14 +13,14 @@ const StoryUploadImage = ({ uploadData, setUploadData }: any) => {
     if (status !== "granted") {
       Alert.alert(
         "Permission Denied",
-        "We need access to your photos to upload a story."
+        "We need access to your photos to upload a story.",
       );
       return;
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaType,
-      allowsEditing: true,
+      allowsEditing: false,
       aspect: [4, 3],
       quality: 1,
     });
@@ -56,7 +56,6 @@ const StoryUploadImage = ({ uploadData, setUploadData }: any) => {
           </View>
         ) : (
           <View className="h-64 rounded-xl bg-green-100 border-2 border-dashed border-green-300 flex flex-col items-center justify-center">
-            
             <Entypo name="plus" size={30} color="black" />
           </View>
         )}

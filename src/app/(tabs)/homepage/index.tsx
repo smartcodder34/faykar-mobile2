@@ -256,31 +256,37 @@ const Homepage = () => {
                 </Text>
               </View>
 
-              <View className="w-full h-48">
+              <View
+                style={{
+                  width: width - 32,
+                  height: 192,
+                  alignSelf: "center",
+                  position: "relative",
+                }}
+              >
                 <FlatList
-                  // We use .flat() to turn [[url1, url2]] into [url1, url2]
                   data={item.images?.flat() || []}
                   horizontal
                   pagingEnabled
                   showsHorizontalScrollIndicator={false}
                   keyExtractor={(_, imgIndex) => imgIndex.toString()}
-                  // Ensure the slider knows exactly how wide each 'page' is
                   snapToAlignment="center"
                   decelerationRate="fast"
                   snapToInterval={width - 32}
                   renderItem={({ item: imageUri }) => (
                     <TouchableOpacity
                       activeOpacity={0.9}
-                      style={{ width: width - 32 }} // Matches the parent container width
+                      style={{ width: width - 32, height: 300 }}
                       onPress={() => handleViewProduct(item.id)}
                     >
                       <Image
                         source={{ uri: imageUri }}
-                        style={{
-                          height: "100%",
-                          width: "100%",
+                        style={{ width: "100%", height: "100%" }}
+                        contentFit="contain"
+                        transition={200}
+                        placeholder={{
+                          blurhash: "L6PZfSi_.AyE_3t7t7R**0o#DgR4",
                         }}
-                        contentFit="cover"
                       />
                     </TouchableOpacity>
                   )}

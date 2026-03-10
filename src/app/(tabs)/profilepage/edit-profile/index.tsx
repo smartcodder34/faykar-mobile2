@@ -315,10 +315,10 @@ import Screen from "@/src/layout/Screen";
 import { rS, rV } from "@/src/lib/responsivehandler";
 import { getInitials } from "@/src/utils/getInitials";
 import {
-  AntDesign,
-  EvilIcons,
-  FontAwesome,
-  Ionicons,
+    AntDesign,
+    EvilIcons,
+    FontAwesome,
+    Ionicons,
 } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import * as ImageManipulator from "expo-image-manipulator";
@@ -344,7 +344,7 @@ const resizeImage = async (uri: any) => {
   const resizedPhoto = await ImageManipulator.manipulateAsync(
     uri,
     [{ resize: { width: 200 } }], // resize to width of 300 and preserve aspect ratio
-    { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG } // compress and set format
+    { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG }, // compress and set format
   );
   return resizedPhoto;
 };
@@ -374,7 +374,6 @@ const EditProfileScreen = () => {
       gender: "",
     },
   });
-
 
   React.useEffect(() => {
     if (getUserData?.data) {
@@ -409,7 +408,7 @@ const EditProfileScreen = () => {
       await ImagePicker.requestCameraPermissionsAsync();
       let result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.All,
-        allowsEditing: true,
+        allowsEditing: false,
         aspect: [4, 3],
         quality: 1,
       });
