@@ -10,7 +10,14 @@ import { rS, rV } from "@/src/lib/responsivehandler";
 import currencyData from "@/src/mocks/currencies.json";
 import useGetLocation from "@/src/store/locationStore";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
-import { Audio } from "expo-av";
+import {
+  useAudioRecorder,
+  useAudioPlayer,
+  useAudioPlayerStatus,
+  requestRecordingPermissionsAsync,
+  setAudioModeAsync,
+  RecordingPresets,
+} from "expo-audio";
 import * as ImageManipulator from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
@@ -42,10 +49,10 @@ const CreateProduct = () => {
   const router = useRouter();
   // const { control, handleSubmit, formState } = useForm();
   const [voiceMemoUri, setVoiceMemoUri] = useState(null);
-  const [recording, setRecording] = useState<Audio.Recording | null>(null);
   const [recordedUri, setRecordedUri] = useState<string | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const soundRef = React.useRef<Audio.Sound | null>(null);
+  const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
+  const player = useAudioPlayer(recordedUri ? { uri: recordedUri } : null);
+  const playerStatus = useAudioPlayerStatus(player);
 
   const { control, handleSubmit, formState, setValue, watch } = useForm();
 
@@ -68,16 +75,18 @@ const CreateProduct = () => {
   // START RECORDING
   async function startRecording() {
     try {
-      const permission = await Audio.requestPermissionsAsync();
-      if (permission.status === "granted") {
-        await Audio.setAudioModeAsync({
-          allowsRecordingIOS: true,
-          playsInSilentModeIOS: true,
+      const { granted } = await requestRecordingPermissionsAsync();
+      if (granted) {
+        await setAudioModeAsync({
+          allowsRecording: true,
+          playsInSilentMode: true,
         });
-        const { recording } = await Audio.Recording.createAsync(
-          Audio.RecordingOptionsPresets.HIGH_QUALITY,
-        );
-        setRecording(recording);
+        try {
+          await recorder.prepareToRecordAsync();
+        } catch {
+          // Recorder may already be prepared — that's fine
+        }
+        recorder.record();
       }
     } catch (err) {
       console.error("Failed to start recording", err);
@@ -86,24 +95,18 @@ const CreateProduct = () => {
 
   // STOP RECORDING
   async function stopRecording() {
-    setRecording(null);
-    await recording?.stopAndUnloadAsync();
-    const uri = recording?.getURI();
-    setRecordedUri(uri || null);
+    await recorder.stop();
+    setRecordedUri(recorder.uri || null);
   }
 
   // PLAY RECORDING
   async function playSound() {
     if (recordedUri) {
-      setIsPlaying(true);
-      const { sound } = await Audio.Sound.createAsync({ uri: recordedUri });
-      soundRef.current = sound;
-      await sound.playAsync();
-      sound.setOnPlaybackStatusUpdate((status) => {
-        if (status.isLoaded && status.didJustFinish) setIsPlaying(false);
-      });
+      player.play();
     }
   }
+
+  console.log("recordedUri400:", recordedUri);
 
   //MUTATION
   const getProductCategories = useProductCategories();
@@ -211,6 +214,13 @@ const CreateProduct = () => {
       formData.append("latitude", String(userLocation?.user_latitude || ""));
       formData.append("longitude", String(userLocation?.user_longitude || ""));
       formData.append("location", userLocation?.user_address || "");
+      if (recordedUri) {
+        formData.append("audio_record", {
+          uri: recordedUri,
+          type: "audio/m4a",
+          name: "voice_memo.m4a",
+        } as any);
+      }
 
       // Submit the form
       console.log("formData entries:", formData);
@@ -415,7 +425,7 @@ const CreateProduct = () => {
                   className="flex-row items-center bg-primary/10 px-2 py-1 rounded-full"
                 >
                   <Ionicons
-                    name={isPlaying ? "pause-circle" : "play-circle"}
+                    name={playerStatus.playing ? "pause-circle" : "play-circle"}
                     size={18}
                     color="#2E6939"
                   />
@@ -426,19 +436,19 @@ const CreateProduct = () => {
               )}
 
               <TouchableOpacity
-                onPress={recording ? stopRecording : startRecording}
-                className={`flex-row items-center px-2 py-1 rounded-full ${recording ? "bg-red-100" : "bg-primary/10"}`}
+                onPress={recorder.isRecording ? stopRecording : startRecording}
+                className={`flex-row items-center px-2 py-1 rounded-full ${recorder.isRecording ? "bg-red-100" : "bg-primary/10"}`}
               >
                 <Ionicons
-                  name={recording ? "stop-circle" : "mic-outline"}
+                  name={recorder.isRecording ? "stop-circle" : "mic-outline"}
                   size={18}
-                  color={recording ? "red" : "#2E6939"}
+                  color={recorder.isRecording ? "red" : "#2E6939"}
                 />
                 <Text
-                  style={{ color: recording ? "red" : "#2E6939" }}
+                  style={{ color: recorder.isRecording ? "red" : "#2E6939" }}
                   className="ml-1 text-[10px] font-[PoppinsRegular]"
                 >
-                  {recording ? "Stop" : "Record"}
+                  {recorder.isRecording ? "Stop" : "Record"}
                 </Text>
               </TouchableOpacity>
             </View>

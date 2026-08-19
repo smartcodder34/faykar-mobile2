@@ -1,13 +1,14 @@
 import { useVerifyEmail } from "@/src/api-services/authApi/authMutation";
 import OtpPin from "@/src/components/auth/OtpPin";
 import RegisterSuccessSheet from "@/src/components/auth/RegisterSuccessSheet";
-import BottomSheetScreen from "@/src/CustomComps/BottomSheetScreen";
+import BottomSheetScreen, {
+  type BottomSheetScreenRef,
+} from "@/src/CustomComps/BottomSheetScreen";
 import CustomButton from "@/src/CustomComps/CustomButton";
 import LoadingOverlay from "@/src/CustomComps/LoadingOverlay";
 import Screen from "@/src/layout/Screen";
 import useAuthStore from "@/src/store/authStore";
 import { AntDesign } from "@expo/vector-icons";
-import BottomSheet from "@gorhom/bottom-sheet";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import React, { useMemo } from "react";
@@ -34,7 +35,7 @@ const Verification = () => {
   const snapPoints = useMemo(() => ["30%", "50%"], []);
   //open the bottom sheet
 
-  const verifybottomSheetRef = React.useRef<BottomSheet>(null);
+  const verifybottomSheetRef = React.useRef<BottomSheetScreenRef>(null);
   //close the bottom sheet
   const handleVerifyBottomSheetOpen = () =>
     verifybottomSheetRef.current?.expand();

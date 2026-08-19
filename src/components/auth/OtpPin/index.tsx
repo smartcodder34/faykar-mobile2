@@ -1,5 +1,4 @@
 import { rV } from "@/src/lib/responsivehandler";
-import { useNavigation } from "@react-navigation/native";
 import React from "react";
 import { Dimensions, StyleSheet, Text, View } from "react-native";
 import {
@@ -18,7 +17,6 @@ const CELL_COUNT = 4;
 const { width } = Dimensions.get("window");
 
 const OtpPin = ({ value, setValue }: Props) => {
-  const navigation = useNavigation();
   const [isFull, setIsFull] = React.useState(false);
   const ref = useBlurOnFulfill({ value, cellCount: CELL_COUNT });
   const [props, getCellOnLayoutHandler] = useClearByFocusCell({

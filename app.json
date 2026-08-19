@@ -2,15 +2,14 @@
   "expo": {
     "name": "faykar-mobile",
     "slug": "faykar-mobile",
+    "owner": "faykar",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "faykarmobile",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.sunkanmi.faykarmobile",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSCameraUsageDescription": "This app uses the camera to allow users to upload photos of their products.",
@@ -23,8 +22,6 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true,
-      "package": "com.sunkanmi.faykarmobile",
       "permissions": [
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION",
@@ -35,7 +32,8 @@
       ],
       "runtimeVersion": {
         "policy": "appVersion"
-      }
+      },
+      "package": "com.faykar.faykarmobile"
     },
     "web": {
       "bundler": "metro",
@@ -56,10 +54,9 @@
       [
         "@react-native-google-signin/google-signin",
         {
-          "iosUrlScheme": "com.googleusercontent.apps.827497566582-qv2446h76r8bh2amojt44gemrtgac9gj"
+          "iosUrlScheme": "com.googleusercontent.apps.975955685799-mkn1nia7chr0f4v2vh33dt10pr36s44l"
         }
       ],
-
       [
         "expo-location",
         {
@@ -67,7 +64,11 @@
         }
       ],
       "expo-font",
-      "expo-web-browser"
+      "expo-web-browser",
+      "expo-audio",
+      "expo-image",
+      "expo-asset",
+      "expo-status-bar"
     ],
     "experiments": {
       "typedRoutes": true
@@ -75,11 +76,14 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "65b671e2-0ab1-4e53-88df-6fe6cf10b2f5"
+        "projectId": "db90dcb2-92f4-4a3a-ba7e-9ca3e7bef3a7"
       }
     },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
     "updates": {
-      "url": "https://u.expo.dev/65b671e2-0ab1-4e53-88df-6fe6cf10b2f5"
+      "url": "https://u.expo.dev/db90dcb2-92f4-4a3a-ba7e-9ca3e7bef3a7"
     }
   }
 }

@@ -1,78 +1,105 @@
-import BottomSheet, {
-  BottomSheetBackdrop,
-  BottomSheetView,
-} from "@gorhom/bottom-sheet";
-import React, { useCallback } from "react";
-import { StyleSheet } from "react-native";
+import RBSheet from "@lunalee/react-native-raw-bottom-sheet";
+import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
+import { Dimensions, Keyboard, Platform, ScrollView } from "react-native";
 
-type BottomType = {
+export type BottomSheetScreenRef = {
+  expand: () => void;
+  close: () => void;
+};
+
+type BottomSheetScreenProps = {
   message: React.ReactNode;
-  snapPoints?: (number | string)[]; // Pass height as percentage for better scaling
+  snapPoints?: (number | string)[];
   index?: number;
   isBackdropComponent?: boolean;
   enablePanDownToClose?: boolean;
-  pressBehavior?: "none" | "close" | "collapse"; // Define the allowed values
+  pressBehavior?: "none" | "close" | "collapse";
+  keyboardAvoidingViewEnabled?: boolean;
 };
-const BottomSheetScreen = React.forwardRef(
+
+function getSheetHeight(snapPoints?: (number | string)[]): number {
+  if (!snapPoints || snapPoints.length === 0) return 260;
+  const last = snapPoints[snapPoints.length - 1];
+  if (typeof last === "string" && last.endsWith("%")) {
+    return Math.round(
+      (parseFloat(last) / 100) * Dimensions.get("window").height,
+    );
+  }
+  return typeof last === "number" ? last : 260;
+}
+
+const BottomSheetScreen = React.forwardRef<
+  BottomSheetScreenRef,
+  BottomSheetScreenProps
+>(
   (
     {
       message,
       snapPoints,
-      index,
       isBackdropComponent,
       enablePanDownToClose,
-      pressBehavior = "close", // Default value
-    }: BottomType,
-    ref
+      pressBehavior = "close",
+      keyboardAvoidingViewEnabled = true,
+    },
+    ref,
   ) => {
-    // ref
-    // callbacks
-    const handleSheetChanges = useCallback((index: number) => {
-      console.log("handleSheetChanges", index);
+    const rbSheetRef = useRef<any>(null);
+
+    useImperativeHandle(ref, () => ({
+      expand: () => rbSheetRef.current?.open(),
+      close: () => rbSheetRef.current?.close(),
+    }));
+
+    const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+    useEffect(() => {
+      const show = Keyboard.addListener("keyboardDidShow", (e) => {
+        setKeyboardHeight(e.endCoordinates.height);
+      });
+      const hide = Keyboard.addListener("keyboardDidHide", () => {
+        setKeyboardHeight(0);
+      });
+      return () => {
+        show.remove();
+        hide.remove();
+      };
     }, []);
 
-    const renderBackdrop = useCallback(
-      (props: any) => (
-        <BottomSheetBackdrop
-          {...props}
-          appearsOnIndex={0} // Show backdrop when sheet is open
-          disappearsOnIndex={-1} // Hide when sheet is closed
-          // pressBehavior="close" // Close sheet when backdrop is pressed (optional)
-          enablePanDownToClose={true}
-          pressBehavior={pressBehavior} // Close sheet when backdrop is pressed (optional)
-        />
-      ),
-      [pressBehavior]
-    );
+    const baseHeight = getSheetHeight(snapPoints);
+    const adjustedHeight =
+      Platform.OS === "android" && keyboardHeight > 0
+        ? Math.max(baseHeight - keyboardHeight, 200)
+        : baseHeight;
+    const closeOnPressMask =
+      isBackdropComponent !== false && pressBehavior !== "none";
 
     return (
-      <BottomSheet
-        index={index}
-        ref={ref as any}
-        onChange={handleSheetChanges}
-        snapPoints={snapPoints}
-        enablePanDownToClose={enablePanDownToClose}
-        backdropComponent={isBackdropComponent ? renderBackdrop : undefined}
+      <RBSheet
+        ref={rbSheetRef}
+        height={adjustedHeight}
+        closeOnDragDown={enablePanDownToClose}
+        closeOnPressMask={closeOnPressMask}
+        animationType="none"
+        keyboardAvoidingViewEnabled={keyboardAvoidingViewEnabled}
+        customStyles={{
+          wrapper: {
+            backgroundColor: isBackdropComponent ? undefined : "transparent",
+          },
+        }}
       >
-        <BottomSheetView>{message}</BottomSheetView>
-      </BottomSheet>
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{ flexGrow: 1 }}
+          style={{ flex: 1 }}
+          showsVerticalScrollIndicator={false}
+        >
+          {message}
+        </ScrollView>
+      </RBSheet>
     );
-  }
+  },
 );
 
 BottomSheetScreen.displayName = "BottomSheetScreen";
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    // height: 200,
-    // backgroundColor: "grey",
-  },
-  contentContainer: {
-    flex: 1,
-    padding: 36,
-    alignItems: "center",
-  },
-});
 
 export default BottomSheetScreen;

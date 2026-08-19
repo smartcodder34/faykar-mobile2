@@ -43,7 +43,7 @@ const ResetPasswordSheet = ({ handleForgotPassswordClose }: any) => {
   };
 
   return (
-    <View className="p-8">
+    <View className="px-8 pb-8 pt-4">
       <View>
         <Text className="font-[PlusJakartaSansSemiBold] text-xl">
           Create New Password

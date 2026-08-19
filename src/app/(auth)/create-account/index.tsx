@@ -54,6 +54,7 @@ const CreateAccount = () => {
   const pwd = watch("password");
 
   const onSubmit = (data: any) => {
+    // console.log("form data: ", `+${form.country_Code}${data.phone_number}`);
     if (data) {
       const requestedPayload = {
         email: data.email.toLowerCase(),
@@ -62,9 +63,9 @@ const CreateAccount = () => {
         password_confirmation: data.password_confirmation,
         phone_number: `+${form.country_Code}${data.phone_number}`,
       };
-      registerUser.mutate(data);
+      registerUser.mutate(requestedPayload);
       setUserRegOtps({
-        email: data.email.toLowerCase(),
+        email: requestedPayload.email.toLowerCase(),
       });
       console.log("testing500: ", requestedPayload);
     }
@@ -78,10 +79,10 @@ const CreateAccount = () => {
       const response = await GoogleSignin.signIn();
       if (isSuccessResponse(response)) {
         // setState({ userInfo: response.data });
-        console.log("User Info --> ", response.data);
+        console.log("User google Info --> ", response.data);
         registerSocialDetails.mutate({
           full_name: response.data?.user.name,
-          phone_number: "+2348109302800",
+          // phone_number: "+2348109302800",
           email: response.data?.user.email,
           provider: "google",
         });
@@ -183,7 +184,7 @@ const CreateAccount = () => {
                 <CustomInput
                   label="Phone Number"
                   primary
-                  placeholder="445 666 4440"
+                  placeholder=" e.g +234 803 436 4440"
                   // keyboardType={"numeric"}
                   value={value}
                   onChangeText={onChange}
@@ -231,8 +232,8 @@ const CreateAccount = () => {
               render={({ field: { onChange, onBlur, value } }) => (
                 <CustomInput
                   primary
-                  label="Email or Phone Number"
-                  placeholder="Enter your email or phone number"
+                  label="Email"
+                  placeholder="Enter your email"
                   // iconPostion="left"
                   onChangeText={onChange}
                   onBlur={onBlur}

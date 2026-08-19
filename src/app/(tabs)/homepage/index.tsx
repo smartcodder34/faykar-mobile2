@@ -51,7 +51,7 @@ const Homepage = () => {
 
     return Object.entries(statusResponse.data)
       .map(([userId, stories]) => {
-        const cleanedStories = stories.map((story) => ({
+        const cleanedStories = stories.map((story: any) => ({
           ...story,
           media_path: story.media_path.trim(),
         }));
