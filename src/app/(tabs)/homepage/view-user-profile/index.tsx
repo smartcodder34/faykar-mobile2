@@ -4,7 +4,10 @@ import {
   useUnFollowUserMutation,
 } from "@/src/api-services/followApi/followerMutation";
 import { useFetchFollowerApi } from "@/src/api-services/followApi/followQuery";
-import { useGetCustomerProducts } from "@/src/api-services/productsApi/productQuery";
+import {
+  useGetCustomerProducts,
+  useGetProducts,
+} from "@/src/api-services/productsApi/productQuery";
 import EmptyState from "@/src/components/EmptyState";
 import UserPostsGrid from "@/src/components/homeScreen/UserPostsGrid";
 import Screen from "@/src/layout/Screen";
@@ -31,12 +34,28 @@ const ViewUserProfile = () => {
   const getCustomerListProducts = useGetCustomerProducts(newData?.seller?.id);
   const userProducts = getCustomerListProducts?.data?.data?.products || [];
 
+  const getAllProducts = useGetProducts();
+  const allProducts = getAllProducts?.data?.data?.products || [];
+
+  // console.log("getCustomerListProducts3000", getCustomerListProducts?.data);
+
+  const liveSeller = useMemo(() => {
+    const sellerId = newData?.seller?.id;
+    const fromFeed = allProducts?.find(
+      (product: any) => product?.seller?.id === sellerId,
+    );
+    const fromCustomer = userProducts?.find(
+      (product: any) => product?.seller?.id === sellerId,
+    );
+    return fromFeed?.seller ?? fromCustomer?.seller ?? newData?.seller;
+  }, [allProducts, userProducts, newData]);
+
   const getUserFollowers = fetchFollowers?.data?.data?.followings;
   const getUserAlreadyFollowed = getUserFollowers?.some(
     (follower: any) => follower.id === newData?.seller?.id,
   );
 
-  console.log("newData", newData);
+  console.log("newData4000", newData);
 
   const handleFollower = (userId: string) => {
     console.log(userId);
@@ -82,7 +101,7 @@ const ViewUserProfile = () => {
             style={{ width: rV(70), height: rV(70) }}
           >
             <Text className=" font-[PoppinsSemiBold] text-3xl">
-              {getInitials(newData?.seller?.full_name)}
+              {getInitials(liveSeller?.full_name)}
             </Text>
           </View>
 
@@ -91,13 +110,13 @@ const ViewUserProfile = () => {
               className="text-primary font-[PoppinsBold]"
               style={{ fontSize: rS(16) }}
             >
-              {newData?.seller?.full_name}
+              {liveSeller?.full_name}
             </Text>
             <Text
               className="font-[PoppinsSemiBold] text-gray-600"
               style={{ fontSize: rS(12) }}
             >
-              {newData?.seller.email}
+              {liveSeller?.email}
             </Text>
           </View>
           <View className=" flex-row items-center">
@@ -163,7 +182,7 @@ const ViewUserProfile = () => {
               className="font-[PoppinsBold] text-black"
               style={{ fontSize: rS(18) }}
             >
-              {newData?.seller?.post_count}
+              {liveSeller?.post_count}
             </Text>
             <Text
               className="font-[PoppinsMedium] text-gray-600"
@@ -178,7 +197,7 @@ const ViewUserProfile = () => {
               className="font-[PoppinsBold] text-black"
               style={{ fontSize: rS(18) }}
             >
-              {newData?.seller.following_count}
+              {liveSeller?.following_count}
             </Text>
             <Text
               className="font-[PoppinsMedium] text-gray-600"
@@ -193,7 +212,7 @@ const ViewUserProfile = () => {
               className="font-[PoppinsBold] text-black"
               style={{ fontSize: rS(18) }}
             >
-              {newData?.seller.follower_count}
+              {liveSeller?.follower_count}
             </Text>
             <Text
               className="font-[PoppinsMedium] text-gray-600"

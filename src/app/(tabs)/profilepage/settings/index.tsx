@@ -28,7 +28,7 @@
 //       leftIcon: <AntDesign name="user" size={24} color="black" />,
 //       rightIcon: <Ionicons name="chevron-forward" size={24} color="black" />,
 //     },
-    
+
 //   ];
 
 //   const handlelogout = () => {
@@ -73,7 +73,7 @@
 
 // export default SettingsScreen;
 
-
+import { useFetchFollowerApi } from "@/src/api-services/followApi/followQuery";
 import CustomButton from "@/src/CustomComps/CustomButton";
 import Screen from "@/src/layout/Screen";
 import { rS, rV } from "@/src/lib/responsivehandler";
@@ -83,16 +83,23 @@ import {
   FontAwesome,
   Ionicons,
   MaterialCommunityIcons,
-  MaterialIcons,
 } from "@expo/vector-icons";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { useRouter } from "expo-router";
 import React from "react";
-import { Alert, Switch, Text, TouchableOpacity, View } from "react-native";
+import { Alert, Text, TouchableOpacity, View } from "react-native";
 
 const SettingsScreen = () => {
   const router = useRouter();
   const [notificationEnabled, setNotificationEnabled] = React.useState(true);
+  const fetchFollowers = useFetchFollowerApi();
+
+  const getFollowerCount = fetchFollowers?.data?.data?.followings?.length ?? 0;
+
+  console.log(
+    "fetchFollowers?.data?.data?.followings",
+    fetchFollowers?.data?.data?.followings.length,
+  );
 
   const mainSettingData = [
     {
@@ -102,20 +109,20 @@ const SettingsScreen = () => {
       rightIcon: <Ionicons name="chevron-forward" size={20} color="#666" />,
       onPress: () => router.push("/profilepage/edit-profile"),
     },
-    {
-      id: 2,
-      title: "Language",
-      leftIcon: <MaterialIcons name="language" size={20} color="#2E6939" />,
-      rightIcon: (
-        <View className="flex-row items-center">
-          <Text className="text-gray-600 mr-2" style={{ fontSize: rS(12) }}>
-            10+
-          </Text>
-          <Ionicons name="chevron-forward" size={20} color="#666" />
-        </View>
-      ),
-      onPress: () => {}, // Add navigation for language settings
-    },
+    // {
+    //   id: 2,
+    //   title: "Language",
+    //   leftIcon: <MaterialIcons name="language" size={20} color="#2E6939" />,
+    //   rightIcon: (
+    //     <View className="flex-row items-center">
+    //       <Text className="text-gray-600 mr-2" style={{ fontSize: rS(12) }}>
+    //         10+
+    //       </Text>
+    //       <Ionicons name="chevron-forward" size={20} color="#666" />
+    //     </View>
+    //   ),
+    //   onPress: () => {}, // Add navigation for language settings
+    // },
     {
       id: 3,
       title: "Friends",
@@ -123,14 +130,14 @@ const SettingsScreen = () => {
       rightIcon: (
         <View className="flex-row items-center">
           <Text className="text-gray-600 mr-2" style={{ fontSize: rS(12) }}>
-            1000+
+            {getFollowerCount}
           </Text>
-          <Ionicons name="chevron-forward" size={20} color="#666" />
+          <Ionicons name="chevron-forward" size={24} color="#666" />
         </View>
       ),
-      // onPress: () => {
-      //   router.push("/profilepage/friends");
-      // }, 
+      onPress: () => {
+        router.push("/profilepage/friends");
+      },
     },
   ];
 
@@ -142,16 +149,19 @@ const SettingsScreen = () => {
         <Ionicons name="notifications-outline" size={20} color="#2E6939" />
       ),
       rightIcon: (
-        <Switch
-          trackColor={{ false: "#D1D5DB", true: "#2E6939" }}
-          thumbColor={notificationEnabled ? "#ffffff" : "#ffffff"}
-          ios_backgroundColor="#D1D5DB"
-          onValueChange={setNotificationEnabled}
-          value={notificationEnabled}
-          style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
-        />
+        // <Switch
+        //   trackColor={{ false: "#D1D5DB", true: "#2E6939" }}
+        //   thumbColor={notificationEnabled ? "#ffffff" : "#ffffff"}
+        //   ios_backgroundColor="#D1D5DB"
+        //   onValueChange={setNotificationEnabled}
+        //   value={notificationEnabled}
+        //   style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
+        // />
+        <Ionicons name="chevron-forward" size={24} color="#666" />
       ),
-      onPress: () => {},
+      onPress: () => {
+        router.push("/homepage/notifications");
+      },
     },
     {
       id: 2,
@@ -176,8 +186,6 @@ const SettingsScreen = () => {
       onPress: () => {}, // Add navigation for about
     },
   ];
-
-  
 
   const handlelogout = () => {
     Alert.alert("Logout!", "Are you sure you want to logout?", [
