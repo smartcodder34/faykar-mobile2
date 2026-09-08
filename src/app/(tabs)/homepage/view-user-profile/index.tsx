@@ -12,7 +12,7 @@ import { rS, rV } from "@/src/lib/responsivehandler";
 import { getInitials } from "@/src/utils/getInitials";
 import { FontAwesome6, Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
 const ViewUserProfile = () => {

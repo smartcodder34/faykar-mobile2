@@ -108,8 +108,10 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
+  TouchableWithoutFeedback,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { Edge } from "react-native-safe-area-context";
 import SafeScreen from "../components/SafeScreen";
 
@@ -168,12 +170,15 @@ export default function Screen({
   contentClassName = "",
   keyboardAware = true,
   dismissKeyboardOnTap = true,
-  keyboardOffset = Platform.select({ ios: 0, android: 0 }),
+  keyboardOffset,
   scrollEnabled = true,
   showsVerticalScrollIndicator = false,
   bounces = true,
   bottomOffset = 20,
 }: ScreenProps) {
+  const insets = useSafeAreaInsets();
+  const resolvedKeyboardOffset =
+    keyboardOffset ?? Platform.select({ ios: insets.top, android: 0 }) ?? 0;
   const containerClasses = useMemo(
     () => ["bg-white", className].filter(Boolean).join(" "),
     [className],
@@ -218,8 +223,8 @@ export default function Screen({
     return (
       <KeyboardAvoidingView
         style={styles.flex}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        keyboardVerticalOffset={keyboardOffset}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={resolvedKeyboardOffset}
       >
         {renderContent()}
       </KeyboardAvoidingView>
@@ -238,9 +243,9 @@ export default function Screen({
 
   return (
     <SafeScreen edges={edges} className={containerClasses}>
-      <View style={styles.flex}>
-        {content}
-      </View>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <View style={styles.flex}>{content}</View>
+      </TouchableWithoutFeedback>
     </SafeScreen>
   );
 }

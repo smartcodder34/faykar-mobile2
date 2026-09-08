@@ -6,6 +6,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import "../../global.css";
@@ -84,19 +85,21 @@ export default function RootLayout() {
     <>
       <QueryClientProvider client={queryClient}>
         <SafeAreaProvider>
-          <GestureHandlerRootView style={{ flex: 1 }}>
-            <NetworkStatus />
-            <Stack>
-              <Stack.Protected guard={isLoggedIn}>
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              </Stack.Protected>
-              <Stack.Protected guard={!isLoggedIn}>
-                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-              </Stack.Protected>
-            </Stack>
-            <StatusBar style="auto" />
-            <Toast config={toastConfig} />
-          </GestureHandlerRootView>
+          <KeyboardProvider>
+            <GestureHandlerRootView style={{ flex: 1 }}>
+              <NetworkStatus />
+              <Stack>
+                <Stack.Protected guard={isLoggedIn}>
+                  <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                </Stack.Protected>
+                <Stack.Protected guard={!isLoggedIn}>
+                  <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                </Stack.Protected>
+              </Stack>
+              <StatusBar style="auto" />
+              <Toast config={toastConfig} />
+            </GestureHandlerRootView>
+          </KeyboardProvider>
         </SafeAreaProvider>
       </QueryClientProvider>
     </>

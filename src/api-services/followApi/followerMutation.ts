@@ -9,7 +9,7 @@ export const useFollowUserMutation = () => {
       // Invalidate and refetch products after successful like
       queryClient.invalidateQueries({ queryKey: ["get-products"] });
       queryClient.invalidateQueries({ queryKey: ["get-profile"] });
-
+      queryClient.invalidateQueries({ queryKey: ["fetch-follow"] });
     },
     onError: (error) => {
       console.error("Failed to like product:", error);
@@ -26,7 +26,7 @@ export const useUnFollowUserMutation = () => {
       // Invalidate and refetch products after successful like
       queryClient.invalidateQueries({ queryKey: ["get-products"] });
       queryClient.invalidateQueries({ queryKey: ["get-profile"] });
-
+      queryClient.invalidateQueries({ queryKey: ["fetch-follow"] });
     },
     onError: (error) => {
       console.error("Failed to like product:", error);

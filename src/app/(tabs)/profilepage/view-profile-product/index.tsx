@@ -131,7 +131,7 @@ const ViewProfileProduct = () => {
   );
 
   return (
-    <Screen className="" scroll={false}>
+    <Screen className="" scroll={false} keyboardAware={false}>
       <View className="flex-row items-center justify-between p-4 bg-white">
         <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="chevron-back" size={24} color="#2E6939" />

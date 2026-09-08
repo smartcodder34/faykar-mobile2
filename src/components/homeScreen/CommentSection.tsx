@@ -5,8 +5,6 @@ import React, { useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
-  KeyboardAvoidingView,
-  Platform,
   Text,
   TextInput,
   TouchableOpacity,
@@ -117,62 +115,54 @@ const CommentSection = ({
   // );
 
   return (
-    // ✅ Wrap everything in KeyboardAvoidingView
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 50} // adjust based on your header height
-    >
-      <View className="flex-1 bg-white">
-        <FlatList
-          data={comments}
-          renderItem={renderComment}
-          keyExtractor={(item) => item.id.toString()}
-          ListHeaderComponent={ListHeaderComponent}
-          contentContainerStyle={{ paddingBottom: 20 }}
-          // ✅ Add this so list scrolls above the input
-          keyboardShouldPersistTaps="handled"
-          ListEmptyComponent={
-            !getProductCommentLists.isLoading ? (
-              <View className="items-center py-10">
-                <Text className="text-gray-400">
-                  No comments yet. Be the first!
-                </Text>
-              </View>
-            ) : null
-          }
-        />
-
-        <KeyboardStickyView offset={{ opened: 0, closed: 0 }}>
-          <View className="p-4 border-t border-gray-100 bg-white">
-            <View className="flex-row items-center bg-white rounded-full px-4 py-1 border border-gray-200">
-              <TextInput
-                value={newComment}
-                onChangeText={setNewComment}
-                placeholder="Write a comment..."
-                className="flex-1 h-10 text-sm text-gray-800"
-                multiline={false}
-                returnKeyType="send"
-                onSubmitEditing={handleSubmitComment}
-              />
-              <TouchableOpacity
-                onPress={handleSubmitComment}
-                disabled={!newComment.trim() || commentOnProduct.isPending}
-                className={`ml-2 w-8 h-8 rounded-full items-center justify-center ${
-                  newComment.trim() ? "bg-primary" : "bg-gray-300"
-                }`}
-              >
-                {commentOnProduct.isPending ? (
-                  <ActivityIndicator color="#fff" size="small" />
-                ) : (
-                  <Ionicons name="send" size={16} color="white" />
-                )}
-              </TouchableOpacity>
+    <View className="flex-1 bg-white">
+      <FlatList
+        data={comments}
+        renderItem={renderComment}
+        keyExtractor={(item) => item.id.toString()}
+        ListHeaderComponent={ListHeaderComponent}
+        contentContainerStyle={{ paddingBottom: 20 }}
+        keyboardShouldPersistTaps="handled"
+        ListEmptyComponent={
+          !getProductCommentLists.isLoading ? (
+            <View className="items-center py-10">
+              <Text className="text-gray-400">
+                No comments yet. Be the first!
+              </Text>
             </View>
+          ) : null
+        }
+      />
+
+      <KeyboardStickyView offset={{ opened: 0, closed: 0 }}>
+        <View className="p-4 border-t border-gray-100 bg-white">
+          <View className="flex-row items-center bg-white rounded-full px-4 py-1 border border-gray-200">
+            <TextInput
+              value={newComment}
+              onChangeText={setNewComment}
+              placeholder="Write a comment..."
+              className="flex-1 h-10 text-sm text-gray-800"
+              multiline={false}
+              returnKeyType="send"
+              onSubmitEditing={handleSubmitComment}
+            />
+            <TouchableOpacity
+              onPress={handleSubmitComment}
+              disabled={!newComment.trim() || commentOnProduct.isPending}
+              className={`ml-2 w-8 h-8 rounded-full items-center justify-center ${
+                newComment.trim() ? "bg-primary" : "bg-gray-300"
+              }`}
+            >
+              {commentOnProduct.isPending ? (
+                <ActivityIndicator color="#fff" size="small" />
+              ) : (
+                <Ionicons name="send" size={16} color="white" />
+              )}
+            </TouchableOpacity>
           </View>
-        </KeyboardStickyView>
-      </View>
-    </KeyboardAvoidingView>
+        </View>
+      </KeyboardStickyView>
+    </View>
   );
 };
 

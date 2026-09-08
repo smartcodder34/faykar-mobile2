@@ -141,7 +141,12 @@ const Homepage = () => {
 
       {/* Share your Product Section */}
       <View className="mx-4 mb-4 flex-row items-center">
-        <View className="w-10 h-10 rounded-full mr-3">
+        <TouchableOpacity
+          className="w-10 h-10 rounded-full mr-3"
+          onPress={() => {
+            router.push("/profilepage");
+          }}
+        >
           {getUserData?.data?.data?.profile_img ? (
             <Image
               source={{ uri: getUserData?.data?.data?.profile_img }}
@@ -159,7 +164,7 @@ const Homepage = () => {
               </Text>
             </View>
           )}
-        </View>
+        </TouchableOpacity>
 
         <TouchableOpacity
           className="flex-1 bg-primary rounded-full px-4 py-3"

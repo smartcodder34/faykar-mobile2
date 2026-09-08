@@ -195,16 +195,12 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   Alert,
-  Platform,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import {
-  KeyboardAvoidingView,
-  KeyboardStickyView,
-} from "react-native-keyboard-controller";
+import { KeyboardStickyView } from "react-native-keyboard-controller";
 import { db } from "../../../../../../firebase-config";
 
 interface Message {
@@ -376,7 +372,7 @@ const ChatRoom = () => {
   );
 
   return (
-    <Screen className="bg-white" scroll={true}>
+    <Screen className="bg-white" scroll={false} keyboardAware={false}>
       <LoadingOverlay
         isOpen={getUserData.isLoading || !isRoomReady}
         message={
@@ -406,61 +402,55 @@ const ChatRoom = () => {
         </TouchableOpacity>
       </View>
 
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 100} // tune to your header height
-      >
-        {/* Chat Messages */}
-        <View className="flex-1 justify-between bg-neutral-100 overflow-visible">
-          <View className="flex-1">
-            <MessagesList messages={messages} currentUserId={currentUserId} />
-          </View>
-
-          {/* Input Area */}
-          <KeyboardStickyView offset={{ opened: 0, closed: 0 }}>
-            <View className="p-4" style={{ marginBottom: 20 }}>
-              <View className="flex-row justify-between items-center bg-white rounded-2xl px-4 py-2">
-                <Controller
-                  control={control}
-                  name="text"
-                  rules={{
-                    required: "Message is required",
-                    validate: (value) =>
-                      value.trim().length > 0 || "Message cannot be empty",
-                  }}
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <TextInput
-                      placeholder="Type message"
-                      className="flex-1 h-10"
-                      onChangeText={onChange}
-                      onBlur={onBlur}
-                      value={value}
-                      editable={!isSending && isRoomReady}
-                      multiline
-                    />
-                  )}
-                />
-                <TouchableOpacity
-                  onPress={handleSubmit(handleMessages)}
-                  disabled={isSending || !isRoomReady}
-                >
-                  <Ionicons
-                    name="send"
-                    size={20}
-                    color={isSending || !isRoomReady ? "#cccccc" : "#2E6939"}
-                  />
-                </TouchableOpacity>
-              </View>
-              {errors.text && (
-                <Text className="text-red-500 text-xs mt-1 ml-4">
-                  {errors.text.message}
-                </Text>
-              )}
-            </View>
-          </KeyboardStickyView>
+      {/* Chat Messages */}
+      <View className="flex-1 justify-between bg-neutral-100 overflow-visible">
+        <View className="flex-1">
+          <MessagesList messages={messages} currentUserId={currentUserId} />
         </View>
-      </KeyboardAvoidingView>
+
+        {/* Input Area */}
+        <KeyboardStickyView offset={{ opened: 0, closed: 0 }}>
+          <View className="p-4" style={{ marginBottom: 20 }}>
+            <View className="flex-row justify-between items-center bg-white rounded-2xl px-4 py-2">
+              <Controller
+                control={control}
+                name="text"
+                rules={{
+                  required: "Message is required",
+                  validate: (value) =>
+                    value.trim().length > 0 || "Message cannot be empty",
+                }}
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <TextInput
+                    placeholder="Type message"
+                    className="flex-1 h-10"
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    value={value}
+                    editable={!isSending && isRoomReady}
+                    multiline
+                  />
+                )}
+              />
+              <TouchableOpacity
+                onPress={handleSubmit(handleMessages)}
+                disabled={isSending || !isRoomReady}
+              >
+                <Ionicons
+                  name="send"
+                  size={20}
+                  color={isSending || !isRoomReady ? "#cccccc" : "#2E6939"}
+                />
+              </TouchableOpacity>
+            </View>
+            {errors.text && (
+              <Text className="text-red-500 text-xs mt-1 ml-4">
+                {errors.text.message}
+              </Text>
+            )}
+          </View>
+        </KeyboardStickyView>
+      </View>
     </Screen>
   );
 };
