@@ -1,13 +1,12 @@
 import { create } from "zustand";
 
 const getAllMessage = (set: any) => ({
- 
-  chatMessages:[],
+  chatMessages: null,
 
   setChatMessages: (data: any) => {
     set((state: any) => ({
       ...state,
-      chatMessages: [...state.chatMessages, ...data],
+      chatMessages: data,
     }));
   },
 });

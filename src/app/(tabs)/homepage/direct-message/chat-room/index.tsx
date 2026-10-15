@@ -178,6 +178,7 @@ import MessagesList from "@/src/components/directMessageComp/MessagesList";
 import LoadingOverlay from "@/src/CustomComps/LoadingOverlay";
 import Screen from "@/src/layout/Screen";
 import { rS } from "@/src/lib/responsivehandler";
+import useGetAllMessage from "@/src/store/chatStore";
 import { getRoomId } from "@/src/utils/getRoomId";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -185,11 +186,15 @@ import {
   addDoc,
   collection,
   doc,
+  getDoc,
+  increment,
   onSnapshot,
   orderBy,
   query,
   setDoc,
   Timestamp,
+  updateDoc,
+  writeBatch,
 } from "firebase/firestore";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -240,23 +245,41 @@ const ChatRoom = () => {
 
   const currentUserId = getUserData.data?.data?.id;
 
+  const chatMessages = useGetAllMessage((state: any) => state.chatMessages) as any;
+
   const newData = useMemo(() => {
     return params.item
       ? JSON.parse(params.item as string)
       : { seller: { id: "", full_name: "Unknown" } };
   }, [params.item]);
 
+  const currentUserName =
+    chatMessages?.currentUserName ||
+    getUserData.data?.data?.full_name ||
+    "Unknown";
+
+  const otherUserId =
+    chatMessages?.otherUserId ||
+    chatMessages?.seller?.id ||
+    newData.seller?.id;
+
+  const otherName =
+    chatMessages?.seller?.full_name ||
+    chatMessages?.name ||
+    newData.seller?.full_name ||
+    "Unknown User";
+
   // Memoize roomId to avoid recalculating
   const roomId = useMemo(() => {
-    if (!currentUserId || !newData.seller?.id) return null;
-    return getRoomId(currentUserId, newData.seller.id);
-  }, [currentUserId, newData.seller?.id]);
+    if (!currentUserId || !otherUserId) return null;
+    return getRoomId(currentUserId, otherUserId);
+  }, [currentUserId, otherUserId]);
 
   console.log("roomId", roomId);
 
   // Setup chat room and listener
   useEffect(() => {
-    if (!roomId || !currentUserId || !newData.seller?.id) {
+    if (!roomId || !currentUserId || !otherUserId) {
       console.warn("Missing required data for chat room");
       return;
     }
@@ -265,19 +288,22 @@ const ChatRoom = () => {
 
     const setupChatRoom = async () => {
       try {
-        // Create room if it doesn't exist
+        // Create room if it doesn't exist (never overwrite existing meta)
         const roomDocRef = doc(db, "rooms", roomId);
-        await setDoc(
-          roomDocRef,
-          {
+        const snapshot = await getDoc(roomDocRef);
+        if (!snapshot.exists()) {
+          await setDoc(roomDocRef, {
             roomId,
-            receiverName: newData.seller?.full_name,
+            receiverName: otherName,
             createdAt: Timestamp.fromDate(new Date()),
-            participants: [currentUserId, newData.seller.id],
+            participants: [currentUserId, otherUserId],
+            participantNames: {
+              [currentUserId]: currentUserName,
+              [otherUserId]: otherName,
+            },
             lastUpdated: Timestamp.fromDate(new Date()),
-          },
-          { merge: true }, // Prevents overwriting existing data
-        );
+          });
+        }
 
         setIsRoomReady(true);
 
@@ -312,12 +338,46 @@ const ChatRoom = () => {
         unsubscribe();
       }
     };
-  }, [roomId, currentUserId, newData.seller?.id]);
+  }, [roomId, currentUserId, otherUserId, otherName, currentUserName]);
+
+  // Mark the other user's messages as read + zero this user's unread counter
+  const markRoomRead = useCallback(async () => {
+    if (!roomId || !currentUserId) return;
+
+    try {
+      const unreadMessages = messages.filter(
+        (m) => m.senderId !== currentUserId && !m.readStatus
+      );
+
+      const docRef = doc(db, "rooms", roomId);
+      const batch = writeBatch(db);
+
+      unreadMessages.forEach((m) => {
+        batch.update(doc(db, "rooms", roomId, "messages", m.id), {
+          readStatus: true,
+        });
+      });
+
+      batch.update(docRef, {
+        [`unreadCounts.${currentUserId}`]: 0,
+        [`lastReadAt.${currentUserId}`]: Timestamp.now(),
+      });
+
+      await batch.commit();
+    } catch (error) {
+      console.error("Error marking room as read: ", error);
+    }
+  }, [messages, roomId, currentUserId]);
+
+  // Mark incoming messages as read once they load
+  useEffect(() => {
+    markRoomRead();
+  }, [messages, markRoomRead]);
 
   // Handle sending messages
   const handleMessages = useCallback(
     async (data: FormData) => {
-      if (!roomId || !currentUserId || !newData.seller?.id) {
+      if (!roomId || !currentUserId || !otherUserId) {
         Alert.alert("Error", "Missing required information.");
         return;
       }
@@ -341,24 +401,35 @@ const ChatRoom = () => {
         const messageData = {
           text: trimmedText,
           senderId: currentUserId,
-          receiverName: newData.seller.full_name,
-          receiverId: newData.seller.id,
+          receiverName: otherName,
+          receiverId: otherUserId,
           createdAt: Timestamp.fromDate(new Date()),
           readStatus: false,
         };
 
         await addDoc(messagesRef, messageData);
 
-        // Update room's last message info
+        // Update room's last message info + participantNames
         await setDoc(
           roomDocRef,
           {
             lastMessageAt: Timestamp.fromDate(new Date()),
             lastMessage: trimmedText,
             lastSenderId: currentUserId,
+            participants: [currentUserId, otherUserId],
+            receiverName: otherName,
+            participantNames: {
+              [currentUserId]: currentUserName,
+              [otherUserId]: otherName,
+            },
           },
           { merge: true },
         );
+
+        // Increment the other user's unread count
+        await updateDoc(roomDocRef, {
+          [`unreadCounts.${otherUserId}`]: increment(1),
+        });
 
         reset();
       } catch (error) {
@@ -368,7 +439,7 @@ const ChatRoom = () => {
         setIsSending(false);
       }
     },
-    [roomId, currentUserId, newData.seller, isRoomReady, reset],
+    [roomId, currentUserId, otherUserId, otherName, currentUserName, isRoomReady, reset],
   );
 
   return (
@@ -392,7 +463,7 @@ const ChatRoom = () => {
             className="font-[PoppinsSemiBold] text-primary"
             style={{ fontSize: rS(18) }}
           >
-            {newData.seller?.full_name || "Unknown User"}
+            {otherName || "Unknown User"}
           </Text>
           <Text className="text-gray-500 text-sm">Last seen 2hrs ago</Text>
         </View>
