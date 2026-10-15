@@ -12,6 +12,7 @@ import useGetLocation from "@/src/store/locationStore";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import {
   useAudioRecorder,
+  useAudioRecorderState,
   useAudioPlayer,
   useAudioPlayerStatus,
   requestRecordingPermissionsAsync,
@@ -48,9 +49,9 @@ const resizeImage = async (uri: any) => {
 const CreateProduct = () => {
   const router = useRouter();
   // const { control, handleSubmit, formState } = useForm();
-  const [voiceMemoUri, setVoiceMemoUri] = useState(null);
   const [recordedUri, setRecordedUri] = useState<string | null>(null);
   const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
+  const recorderState = useAudioRecorderState(recorder);
   const player = useAudioPlayer(recordedUri ? { uri: recordedUri } : null);
   const playerStatus = useAudioPlayerStatus(player);
 
@@ -72,31 +73,71 @@ const CreateProduct = () => {
 
   const [selectedCurrency, setSelectedCurrency] = useState<Item | null>(null);
 
+  const startingRef = React.useRef(false);
+  const stoppingRef = React.useRef(false);
+
   // START RECORDING
   async function startRecording() {
+    if (recorder.isRecording || recorderState.isRecording || startingRef.current) {
+      return;
+    }
+    startingRef.current = true;
     try {
       const { granted } = await requestRecordingPermissionsAsync();
-      if (granted) {
-        await setAudioModeAsync({
-          allowsRecording: true,
-          playsInSilentMode: true,
-        });
-        try {
-          await recorder.prepareToRecordAsync();
-        } catch {
-          // Recorder may already be prepared — that's fine
-        }
+      if (!granted) {
+        return;
+      }
+      await setAudioModeAsync({
+        allowsRecording: true,
+        playsInSilentMode: true,
+      });
+      try {
+        await recorder.prepareToRecordAsync();
+      } catch (err) {
+        // Ignore if already prepared
+      }
+      if (!recorder.isRecording && !recorderState.isRecording) {
         recorder.record();
       }
     } catch (err) {
       console.error("Failed to start recording", err);
+    } finally {
+      startingRef.current = false;
     }
   }
 
   // STOP RECORDING
   async function stopRecording() {
-    await recorder.stop();
-    setRecordedUri(recorder.uri || null);
+    if ((!recorder.isRecording && !recorderState.isRecording) || stoppingRef.current) {
+      return;
+    }
+    stoppingRef.current = true;
+    try {
+      await recorder.stop();
+      setRecordedUri(recorder.uri || null);
+    } catch (err) {
+      console.error("Failed to stop recording", err);
+    } finally {
+      stoppingRef.current = false;
+    }
+  }
+
+  // DELETE RECORDING
+  function deleteRecording() {
+    if (
+      recorder.isRecording ||
+      recorderState.isRecording ||
+      startingRef.current ||
+      stoppingRef.current
+    ) {
+      return;
+    }
+    try {
+      player.pause();
+    } catch (err) {
+      // Player may not be loaded; safe to ignore
+    }
+    setRecordedUri(null);
   }
 
   // PLAY RECORDING
@@ -105,8 +146,6 @@ const CreateProduct = () => {
       player.play();
     }
   }
-
-  console.log("recordedUri400:", recordedUri);
 
   //MUTATION
   const getProductCategories = useProductCategories();
@@ -432,23 +471,32 @@ const CreateProduct = () => {
                   <Text className="ml-1 text-[10px] text-primary">
                     Play Memo
                   </Text>
+                  {!recorderState.isRecording && (
+                    <TouchableOpacity
+                      onPress={deleteRecording}
+                      className="ml-2 pl-2 border-l border-primary/20"
+                      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                    >
+                      <Ionicons name="trash-outline" size={14} color="#DC2626" />
+                    </TouchableOpacity>
+                  )}
                 </TouchableOpacity>
               )}
 
               <TouchableOpacity
-                onPress={recorder.isRecording ? stopRecording : startRecording}
-                className={`flex-row items-center px-2 py-1 rounded-full ${recorder.isRecording ? "bg-red-100" : "bg-primary/10"}`}
+                onPress={recorderState.isRecording ? stopRecording : startRecording}
+                className={`flex-row items-center px-2 py-1 rounded-full ${recorderState.isRecording ? "bg-red-100" : "bg-primary/10"}`}
               >
                 <Ionicons
-                  name={recorder.isRecording ? "stop-circle" : "mic-outline"}
+                  name={recorderState.isRecording ? "stop-circle" : "mic-outline"}
                   size={18}
-                  color={recorder.isRecording ? "red" : "#2E6939"}
+                  color={recorderState.isRecording ? "red" : "#2E6939"}
                 />
                 <Text
-                  style={{ color: recorder.isRecording ? "red" : "#2E6939" }}
+                  style={{ color: recorderState.isRecording ? "red" : "#2E6939" }}
                   className="ml-1 text-[10px] font-[PoppinsRegular]"
                 >
-                  {recorder.isRecording ? "Stop" : "Record"}
+                  {recorderState.isRecording ? "Stop" : "Record"}
                 </Text>
               </TouchableOpacity>
             </View>

@@ -17,6 +17,7 @@ import {
   Dimensions,
   FlatList,
   ScrollView,
+  Share,
   Text,
   TouchableOpacity,
   View,
@@ -133,6 +134,25 @@ const Homepage = () => {
       pathname: `/homepage/view-user-profile`,
       params: { item: JSON.stringify(item) },
     });
+  };
+
+  const handleShareProduct = async (item: any) => {
+    try {
+      const imageUrl = item.images?.flat()?.[0];
+      const price = `${item.currency || ""}${item.amount || ""}`.trim();
+      const message = [
+        `Check out "${item.name || "this product"}" on Faykar`,
+        item.description ? `\n\n${item.description}` : "",
+        price ? `\n\nPrice: ${price}` : "",
+        imageUrl ? `\n\n${imageUrl}` : "",
+      ].join("");
+      await Share.share(
+        { title: item.name || "Faykar Product", message },
+        { dialogTitle: "Share this product" },
+      );
+    } catch (err) {
+      console.error("Failed to share product", err);
+    }
   };
 
   return (
@@ -341,6 +361,13 @@ const Homepage = () => {
                       color="#666"
                     />
                     <Text className="mx-2">{item?.comments_count || 0}</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    className="mx-2 flex-row items-center"
+                    onPress={() => handleShareProduct(item)}
+                  >
+                    <Ionicons name="share-outline" size={20} color="#666" />
                   </TouchableOpacity>
                 </View>
 

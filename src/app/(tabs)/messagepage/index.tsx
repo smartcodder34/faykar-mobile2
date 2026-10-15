@@ -93,8 +93,7 @@ const MessagePage = () => {
             return bTime - aTime;
           }) as RoomData[];
 
-        console.log("Filtered rooms for current user:", allRooms);
-        setRooms(allRooms);
+            setRooms(allRooms);
         setIsLoading(false);
       },
       (error) => {
@@ -213,7 +212,7 @@ const MessagePage = () => {
   };
 
   return (
-    <Screen className="bg-white" scroll={true}>
+    <Screen className="bg-white" scroll={true} keyboardAware={false}>
       {/* Header */}
       <View className="flex-row items-center justify-between px-4 py-3 bg-white">
         <TouchableOpacity onPress={() => router.back()}>

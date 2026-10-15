@@ -24,6 +24,7 @@ const ProfilePage = () => {
   const userProducts = getCustomerListProducts?.data?.data?.products || [];
 
   // console.log("getCustomerListProducts2000:", getCustomerListProducts);
+  console.log("getUserData?.data?.data:", getUserData?.data?.data);
 
   React.useEffect(() => {
     if (userId) {
@@ -99,7 +100,6 @@ const ProfilePage = () => {
               {getUserData?.data?.data?.email}
             </Text>
           </View>
-         
         </View>
 
         {/* Bio */}
@@ -108,9 +108,7 @@ const ProfilePage = () => {
             className="font-[PoppinsMedium] text-gray-700"
             style={{ fontSize: rS(12) }}
           >
-            {
-              "I'm a positive person. I love to travel and eat Always available for chat"
-            }
+            {getUserData?.data?.data?.bio || "No bio available."}
           </Text>
         </View>
 

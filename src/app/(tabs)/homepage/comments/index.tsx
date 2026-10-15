@@ -207,7 +207,12 @@ const CommentsScreen = () => {
   }, [productId]);
 
   return (
-    <Screen className="bg-white" scroll={false} keyboardAware={false}>
+    <Screen
+      className="bg-white"
+      scroll={false}
+      keyboardAware={false}
+      edges={["top", "left", "right", "bottom"]}
+    >
       <View className="flex-1">
         {/* Header */}
         <View className="flex-row items-center justify-between p-4 border-b border-gray-100">

@@ -275,7 +275,6 @@ const ChatRoom = () => {
     return getRoomId(currentUserId, otherUserId);
   }, [currentUserId, otherUserId]);
 
-  console.log("roomId", roomId);
 
   // Setup chat room and listener
   useEffect(() => {
@@ -358,10 +357,12 @@ const ChatRoom = () => {
         });
       });
 
-      batch.update(docRef, {
-        [`unreadCounts.${currentUserId}`]: 0,
-        [`lastReadAt.${currentUserId}`]: Timestamp.now(),
-      });
+      if (unreadMessages.length > 0) {
+        batch.update(docRef, {
+          [`unreadCounts.${currentUserId}`]: 0,
+          [`lastReadAt.${currentUserId}`]: Timestamp.now(),
+        });
+      }
 
       await batch.commit();
     } catch (error) {

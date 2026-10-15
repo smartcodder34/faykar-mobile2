@@ -5,10 +5,12 @@ import DiscoverScreen from '@/src/components/searchScreen/discoverScreen';
 import Screen from '@/src/layout/Screen';
 import { rS } from '@/src/lib/responsivehandler';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 const SearchPage = () => {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTab, setSelectedTab] = useState("Discover");
   
@@ -41,6 +43,20 @@ const SearchPage = () => {
 
   return (
     <Screen className="bg-white" scroll={true}>
+      {/* Header */}
+      <View className="flex-row items-center justify-between px-4 py-3 bg-white">
+        <TouchableOpacity onPress={() => router.back()}>
+          <Ionicons name="chevron-back" size={24} color="#2E6939" />
+        </TouchableOpacity>
+        <Text
+          className="font-[PoppinsSemiBold] text-primary"
+          style={{ fontSize: rS(18) }}
+        >
+          Search
+        </Text>
+        <View />
+      </View>
+
       {/* Search Input */}
       <View className="px-4 py-3 bg-white">
         <View className="bg-white border border-gray-200 rounded-2xl px-4 py-3 flex-row items-center">

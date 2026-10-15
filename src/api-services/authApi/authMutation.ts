@@ -30,7 +30,7 @@ export const useRegisterUser = () => {
       router.push("/(auth)/create-account/verification");
     },
     onError(error: any) {
-      console.log("error55", error?.response.data.message)
+      console.log("error55", error?.response.data.message);
       handleAxiosError(error);
     },
   });
@@ -47,11 +47,10 @@ export const useVerifyEmail = (handleVerifyBottomSheetOpen: () => void) => {
     },
     onError(error: any) {
       handleAxiosError(error);
-       Toast.show({
-         type: "error",
-         text1: error,
-       });
-      
+      Toast.show({
+        type: "error",
+        text1: error,
+      });
     },
   });
 };
@@ -121,9 +120,8 @@ export const useEditUser = () => {
       // showSuccessToast({
       //   message: data.message,
       // });
-
+      router.back();
       queryClient.invalidateQueries({ queryKey: ["get-profile"] });
-
     },
     onError(error: any) {
       handleAxiosError(error);
@@ -147,8 +145,6 @@ export const useRegisterSocialUser = () => {
   });
 };
 
-
-
 export const useLoginSocialUser = () => {
   const router = useRouter();
   const setIsLoggedIn = useAuthStore().setIsLoggedIn;
@@ -157,7 +153,7 @@ export const useLoginSocialUser = () => {
     mutationFn: loginSocialUser,
     async onSuccess(data) {
       if (data) {
-      console.log("login success data:", data);
+        console.log("login success data:", data);
 
         await AsyncStorage.setItem("token", data.data.access_token.token);
         setIsLoggedIn(true);

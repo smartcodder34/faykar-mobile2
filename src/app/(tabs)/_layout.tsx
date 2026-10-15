@@ -1,91 +1,89 @@
 import { FontAwesome5, Ionicons } from "@expo/vector-icons";
-import { Tabs } from "expo-router";
+import { Tabs, usePathname } from "expo-router";
 import { Platform } from "react-native";
-
-const HIDDEN_ROUTES = ["chat-room"];
 
 const BASE_TAB_BAR_STYLE = Platform.select({
   ios: { position: "absolute" as const },
   default: {},
 });
 
-function getTabBarVisibility(routeName: string) {
-  return HIDDEN_ROUTES.some((r) => routeName.includes(r));
+const HIDDEN_PATHS = [
+  "/homepage/comments",
+  "/messagepage",
+  "/searchpage",
+  "/homepage/direct-message/chat-room",
+];
+
+function isTabBarHidden(pathname: string) {
+  return HIDDEN_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`));
 }
 
 export default function TabsLayout() {
+  const pathname = usePathname();
+  const tabBarStyle = isTabBarHidden(pathname)
+    ? { ...BASE_TAB_BAR_STYLE, display: "none" as const }
+    : BASE_TAB_BAR_STYLE;
+
   return (
     <Tabs
       initialRouteName="homepage"
       screenOptions={{
         headerShown: false,
-        tabBarStyle: BASE_TAB_BAR_STYLE,
+        tabBarStyle,
       }}
       backBehavior="history"
     >
       <Tabs.Screen
         name="homepage"
-        options={({ route }) => ({
+        options={{
           title: "Home",
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ focused }) => (
             <Ionicons
-              name={focused ? "home" : "home"}
+              name={focused ? "home" : "home-outline"}
               size={24}
               color={focused ? "#2E6939" : "#B8B4B4"}
             />
           ),
-          tabBarStyle: getTabBarVisibility(route.name)
-            ? { display: "none" }
-            : BASE_TAB_BAR_STYLE,
-        })}
+        }}
       />
       <Tabs.Screen
         name="messagepage/index"
-        options={({ route }) => ({
+        options={{
           title: "Messages",
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ focused }) => (
             <Ionicons
               name={focused ? "chatbubble" : "chatbubble-outline"}
               size={24}
               color={focused ? "#2E6939" : "#B8B4B4"}
             />
           ),
-          tabBarStyle: getTabBarVisibility(route.name)
-            ? { display: "none" }
-            : BASE_TAB_BAR_STYLE,
-        })}
+        }}
       />
       <Tabs.Screen
         name="searchpage/index"
-        options={({ route }) => ({
+        options={{
           title: "Search",
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ focused }) => (
             <Ionicons
               name={focused ? "search" : "search-outline"}
               size={24}
               color={focused ? "#2E6939" : "#B8B4B4"}
             />
           ),
-          tabBarStyle: getTabBarVisibility(route.name)
-            ? { display: "none" }
-            : BASE_TAB_BAR_STYLE,
-        })}
+        }}
       />
       <Tabs.Screen
         name="profilepage"
-        options={({ route }) => ({
+        options={{
           title: "Profile",
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ focused }) => (
             <FontAwesome5
               name={focused ? "user-alt" : "user-alt"}
               size={24}
               color={focused ? "#2E6939" : "#B8B4B4"}
             />
           ),
-          tabBarStyle: getTabBarVisibility(route.name)
-            ? { display: "none" }
-            : BASE_TAB_BAR_STYLE,
-        })}
+        }}
       />
     </Tabs>
   );

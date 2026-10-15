@@ -1,8 +1,7 @@
 import { Text, View } from "react-native";
 
 const MessageItem = ({ message, currentUserId }: any) => {
-  console.log("currentUserId", currentUserId);
-  if (message.senderId === currentUserId) {
+    if (message.senderId === currentUserId) {
     return (
       <View className=" flex-row justify-end mb-2 mr-3 px-2">
         <View className="">
